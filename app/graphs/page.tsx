@@ -3,7 +3,7 @@ import React from "react";
 
 function Graph() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 
+    <div className="min-h-screen bg-linear-to-b from-gray-50 to-gray-100 
       dark:from-gray-900 dark:to-black text-black dark:text-white 
       transition-colors pt-12 px-6">
       
@@ -28,6 +28,7 @@ function Graph() {
 
           <IntradayChart />
         </div>
+        
       </div>
     </div>
   );

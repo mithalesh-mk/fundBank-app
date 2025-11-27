@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import ReactECharts from "echarts-for-react";
 
 export default function IntradayEChart() {
@@ -40,58 +40,87 @@ export default function IntradayEChart() {
   // Convert to chart format
   const seriesData = rawData.map((d) => [new Date(d.time).getTime(), d.value]);
 
-  // Calculate tight y-axis range
+  // Tight y-axis range
   const values = rawData.map((d) => d.value);
   const minVal = Math.min(...values);
   const maxVal = Math.max(...values);
+
+  // --- 📱 Responsive Scaling ---
+  const { fontSmall, fontMedium, fontLarge, lineWidth } = useMemo(() => {
+    const width = typeof window !== "undefined" ? window.innerWidth : 1200;
+
+    if (width < 500) {
+      // Mobile
+      return {
+        fontSmall: 8,
+        fontMedium: 10,
+        fontLarge: 12,
+        lineWidth: 1,
+      };
+    } else if (width < 900) {
+      // Tablet
+      return {
+        fontSmall: 9,
+        fontMedium: 14,
+        fontLarge: 16,
+        lineWidth: 1,
+      };
+    } else {
+      // Desktop
+      return {
+        fontSmall: 13,
+        fontMedium: 15,
+        fontLarge: 18,
+        lineWidth: 3,
+      };
+    }
+  }, []);
 
   const option = {
     backgroundColor: "transparent",
 
     tooltip: {
-        trigger: "axis",
-        backgroundColor: "rgba(15, 23, 42, 0.95)", // deep slate premium tone
-        borderColor: "rgba(148, 163, 184, 0.25)",
-        borderWidth: 1,
-        padding: 10,
-        extraCssText: "border-radius: 10px; backdrop-filter: blur(6px);",
-        textStyle: { color: "#e2e8f0", fontSize: 12 },
-      
-        formatter: (params: any) => {
-          const p = params[0];
-          const date = new Date(p.value[0]);
-      
-          const formattedDate = date.toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          });
-      
-          const formattedTime = date.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-      
-          return `
-            <div style="display:flex; flex-direction:column; gap:4px;">
-              <div style="font-size:13px; color:#f1f5f9; font-weight:600;">
-                ${formattedDate} · ${formattedTime}
-              </div>
-      
-              <div style="height:1px; background:rgba(148,163,184,0.2); margin:6px 0;"></div>
-      
-              <div style="font-size:12px; color:#94a3b8;">
-                NAV
-              </div>
-              <div style="font-size:16px; color:#22c55e; font-weight:700;">
-                ₹${p.value[1]}
-              </div>
+      trigger: "axis",
+      backgroundColor: "rgba(15, 23, 42, 0.95)",
+      borderColor: "rgba(148, 163, 184, 0.25)",
+      borderWidth: 1,
+      padding: 10,
+      extraCssText: "border-radius: 10px; backdrop-filter: blur(6px);",
+      textStyle: { color: "#e2e8f0", fontSize: fontSmall },
+
+      formatter: (params: any) => {
+        const p = params[0];
+        const date = new Date(p.value[0]);
+
+        const formattedDate = date.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+
+        const formattedTime = date.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        return `
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <div style="font-size:${fontMedium}px; color:#f1f5f9; font-weight:600;">
+              ${formattedDate} · ${formattedTime}
             </div>
-          `;
-        },
+
+            <div style="height:1px; background:rgba(148,163,184,0.2); margin:6px 0;"></div>
+
+            <div style="font-size:${fontSmall}px; color:#94a3b8;">
+              NAV
+            </div>
+            <div style="font-size:${fontLarge}px; color:#22c55e; font-weight:700;">
+              ₹${p.value[1]}
+            </div>
+          </div>
+        `;
       },
-      
-      
+    },
 
     grid: {
       left: "4%",
@@ -101,21 +130,19 @@ export default function IntradayEChart() {
     },
 
     xAxis: {
-        type: "time",
-        axisLabel: { show: false },  // ❌ removes labels
-        axisTick: { show: false },   // ❌ removes tick marks
-        axisLine: { show: true },    // keep line (optional)
-      },
-      
+      type: "time",
+      axisLabel: { show: false },
+      axisTick: { show: false },
+      axisLine: { show: true },
+    },
 
-      yAxis: {
-        type: "value",
-        min: minVal - 0.5,
-        max: maxVal + 0.5,
-        axisLabel: { show: false },  // remove y labels
-        splitLine: { lineStyle: { color: "rgba(100,116,139,0.2)" } },
-      },
-      
+    yAxis: {
+      type: "value",
+      min: minVal - 0.5,
+      max: maxVal + 0.5,
+      axisLabel: { show: false },
+      splitLine: { lineStyle: { color: "rgba(100,116,139,0.2)" } },
+    },
 
     series: [
       {
@@ -125,16 +152,11 @@ export default function IntradayEChart() {
         symbol: "none",
         lineStyle: {
           color: "#22c55e",
-          width: 2.5,
+          width: lineWidth, // responsive line width
         },
-        
       },
     ],
   };
 
-  return (
-    <div className="w-full h-[380px] p-4 rounded-xl bg-white dark:bg-[#0d1117] border border-gray-200 dark:border-gray-800">
-      <ReactECharts option={option} style={{ height: "100%", width: "100%" }} />
-    </div>
-  );
+  return <ReactECharts option={option} style={{ height: "100%", width: "100%" }} />;
 }
