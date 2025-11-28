@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState } from "react";
 import ReactECharts from "echarts-for-react";
-import { shade } from "@primeuix/themes";
 
 // ----- Sample Data (Replace these with API data later) -----
 const dataSets: Record<string, { time: string; value: number }[]> = {
