@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import ReactECharts from "echarts-for-react";
 
 export default function IntradayEChart({
@@ -72,17 +72,12 @@ export default function IntradayEChart({
       },
     },
 
-    grid: {
-      left: "4%",
-      right: "4%",
-      bottom: "6%",
-      top: "10%",
-    },
+    grid: { left: "4%", right: "4%", bottom: "6%", top: "10%" },
 
     // FIXED
     xAxis: {
       type: "time",
-      axisLabel: { show: false },
+      axisLabel: { show: false},
       axisTick: { show: false },
       axisLine: { show: true },
     },
