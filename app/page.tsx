@@ -7,7 +7,7 @@ export default function Home() {
     <div className="px-4 mb-6 md:mb-6 md:py-4 ">
 
       {/* Hero Section */}
-      <section className="mt-10 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 md:p-14 shadow-lg border border-white/20 dark:border-gray-700 transition">
+      <section className="mt-10 bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 md:p-14 shadow-lg border border-white/20 dark:border-gray-700 transition">
         
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight">
           Track. Analyze. Grow Your <span className="text-blue-600 dark:text-blue-400">Investments</span>

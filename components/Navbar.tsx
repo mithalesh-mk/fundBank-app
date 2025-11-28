@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Menu, X, Moon, Sun } from "lucide-react";
 import { useState } from "react";
-import { useTheme } from "@/components/ThemeProvider";
+import { useTheme } from "@/utils/ThemeProvider";
 
 export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
