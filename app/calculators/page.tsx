@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, FC } from "react";
 import { BarChart3, Scale } from "lucide-react";
+import SPICalculator from "@/components/calculators/SIPCalculator";
 
 const tabs: string[] = [
   "SIP",
@@ -24,14 +25,11 @@ const tabs: string[] = [
 const CalculatorContent: FC<{ selectedTab: string }> = ({ selectedTab }) => {
   switch (selectedTab) {
     case "SIP":
-      return <h1 className="text-xl font-medium text-gray-800 dark:text-gray-200">SIP Calculator Component (Working)</h1>;
+      return <SPICalculator />;
     default:
       return (
         <div className="p-6 text-center bg-gray-100 dark:bg-gray-700 rounded-xl">
-          <Scale className="w-10 h-10 mx-auto text-blue-500 mb-3" />
-          <p className="text-gray-600 dark:text-gray-300 font-medium">
-            The <strong>{selectedTab}</strong> calculator is coming soon! Check out the working SIP Calculator for now.
-          </p>
+          <SPICalculator />
         </div>
       );
   }
@@ -124,15 +122,9 @@ const Calculators: FC = () => {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-            rounded-xl shadow-2xl p-6 md:p-8 min-h-[400px]">
-            
-            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-3">
-              {selectedTab} Calculator
-            </h2>
 
             <CalculatorContent selectedTab={selectedTab} />
-          </div>
+          
         </main>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeProvider } from "@/utils/ThemeProvider";
 
 export const metadata = {
   title: "Mutual Fund Platform",
