@@ -1,6 +1,7 @@
 "use client";
 import FilterBar from "@/components/FilterBar";
-import React, { useState } from "react";
+import fundService, { MutualFundScheme } from "@/services/fundService";
+import React, { useEffect, useState } from "react";
 
 interface Fund {
     logo: string;
@@ -12,6 +13,7 @@ interface Fund {
     rating: string;
     risk: string;
 }
+
 const returnKeys: (keyof Fund)[] = ["oneY", "threeY", "fiveY"];
 
 const fundData = [
@@ -69,6 +71,22 @@ const fundData = [
 
 export default function MutualFunds() {
     const [selectedFilters, setSelectedFilters] = useState({});
+    const [funds, setFunds] = useState<MutualFundScheme[]>();
+
+    useEffect(() => {
+        // Fetch all funds on component mount
+        const fetchFunds = async () => {
+            try {
+                const allFunds = await fundService.getAllFunds();
+                setFunds(allFunds);
+                console.log("Fetched funds:", allFunds);
+            } catch (error) {
+                console.error("Error fetching funds:", error);
+            }
+        };
+        fetchFunds();
+    }, []);
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-10">
