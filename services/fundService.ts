@@ -5,6 +5,12 @@ export interface FundNAVResponse {
   data: { date: string; nav: number }[];
 }
 
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
+
+
 export interface MutualFundScheme {
   id: string;
   scheme_code: string;
@@ -37,8 +43,11 @@ class FundService {
   }
 
   async getAllFunds(): Promise<MutualFundScheme[]> {
-    const res: { data: MutualFundScheme[] } = await axiosInstance.get(`/funds/allfunds`);
-    return res.data;
+    const res = await axiosInstance.get<ApiResponse<MutualFundScheme[]>>(
+      "/funds/allfunds"
+    );
+  
+    return res.data.data;  // ✔ fully typed, no TS errors
   }
 
 }
