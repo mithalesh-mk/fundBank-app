@@ -1,6 +1,7 @@
 "use client";
 import FilterBar from "@/components/FilterBar";
 import fundService, { MutualFundScheme } from "@/services/fundService";
+import { Link } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface Fund {
@@ -48,7 +49,7 @@ export default function MutualFunds() {
         "
       >
         {/* SCROLL CONTAINER — DESKTOP */}
-        <div className="hidden md:block max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">  
+        <div className="hidden md:block max-h-[600px] overflow-y-auto overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
           <table className="w-full min-w-[1100px] border-collapse">
             {/* TABLE HEADER */}
             <thead className="sticky top-0 bg-gray-100 dark:bg-gray-700 z-20 shadow-sm">
@@ -76,12 +77,17 @@ export default function MutualFunds() {
                       className="w-8 h-8 rounded"
                       alt=""
                     />
-                    <span className="font-medium text-sm">{fund.scheme_name}</span>
+                    <span className="font-medium text-sm">
+                      <a
+                        href={`/mutual-funds/${fund.scheme_code}`}
+                        className="text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        {fund.scheme_name}
+                      </a>
+                    </span>
                   </td>
 
-                  <td className="px-6 py-3 whitespace-nowrap">
-                    {fund.category || "—"}
-                  </td>
+                  <td className="px-6 py-3 whitespace-nowrap">{fund.category || "—"}</td>
 
                   {returnKeys.map((key) => (
                     <td
@@ -100,8 +106,9 @@ export default function MutualFunds() {
           </table>
         </div>
 
+
         {/* MOBILE — TABLE FORMAT + HORIZONTAL + VERTICAL SCROLL */}
-        <div className="md:hidden max-h-[600px] overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
+        <div className="max-h-[600px] overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
           <table className="min-w-[700px] w-full border-collapse text-[12px]">
             <thead className="sticky top-0 bg-gray-100 dark:bg-gray-700 z-20 shadow-sm">
               <tr className="text-gray-700 dark:text-gray-300">
@@ -128,7 +135,12 @@ export default function MutualFunds() {
                       className="w-6 h-6 rounded"
                       alt=""
                     />
-                    <span>{fund.scheme_name}</span>
+                    <Link
+                      href={`/mutual-funds/${fund.scheme_code}`}
+                      className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      {fund.scheme_name}
+                    </Link>
                   </td>
 
                   <td className="px-3 py-2">{fund.category ?? "—"}</td>
