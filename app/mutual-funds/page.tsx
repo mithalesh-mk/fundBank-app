@@ -82,21 +82,30 @@ export default function MutualFunds() {
                         href={`/mutual-funds/${fund.scheme_code}`}
                         className="text-blue-600 dark:text-blue-400 hover:underline"
                       >
-                        {fund.scheme_name}
+                        {fund.display_name}
                       </a>
                     </span>
                   </td>
 
-                  <td className="px-6 py-3 whitespace-nowrap">{fund.category || "—"}</td>
+                  <td className="px-6 py-3 whitespace-nowrap">{fund.sub_category || "—"}</td>
 
-                  {returnKeys.map((key) => (
+              
                     <td
-                      key={key}
                       className="px-3 py-3 text-center font-medium text-green-600 dark:text-green-400"
                     >
-                      23.45%
+                      {fund.y1_return?.toFixed(2) ?? "—"}%
                     </td>
-                  ))}
+                    <td
+                      className="px-3 py-3 text-center font-medium text-green-600 dark:text-green-400"
+                    >
+                      {fund.y3_return?.toFixed(2) ?? "—"}%
+                    </td>
+                    <td
+                      className="px-3 py-3 text-center font-medium text-green-600 dark:text-green-400"
+                    >
+                      {fund.y5_return?.toFixed(2) ?? "—"}%
+                    </td>
+                
 
                   <td className="px-3 py-3 text-center">₹{fund.nav ?? "—"}</td>
                   <td className="px-3 py-3 text-center">{fund.frequency ?? "—"}</td>
@@ -140,21 +149,30 @@ export default function MutualFunds() {
                         href={`/mutual-funds/${fund.scheme_code}`}
                         className="text-blue-600 dark:text-blue-400 hover:underline"
                       >
-                        {fund.scheme_name}
+                        {fund.display_name}
                       </a>
                     </span>
                   </td>
 
-                  <td className="px-3 py-2">{fund.category ?? "—"}</td>
+                  <td className="px-3 py-2">{fund.sub_category ?? "—"}</td>
 
-                  {returnKeys.map((key) => (
+                  
                     <td
-                      key={key}
                       className="px-3 py-2 text-center text-green-600 dark:text-green-400"
                     >
-                      23.45%
+                      {fund.y1_return?.toFixed(2) ?? "—"}%
                     </td>
-                  ))}
+                    <td
+                      className="px-3 py-2 text-center text-green-600 dark:text-green-400"
+                    >
+                      {fund.y3_return?.toFixed(2) ?? "—"}%
+                    </td>
+                    <td
+                      className="px-3 py-2 text-center text-green-600 dark:text-green-400"
+                    >
+                      {fund.y5_return?.toFixed(2) ?? "—"}%
+                    </td>
+                 
 
                   <td className="px-3 py-2 text-center">{fund.nav ?? "—"}</td>
                   <td className="px-3 py-2 text-center">{fund.frequency ?? "—"}</td>

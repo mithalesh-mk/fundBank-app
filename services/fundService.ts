@@ -24,6 +24,9 @@ export interface MutualFundScheme {
   category_header: string;
   category: string;
   sub_category: string;
+  y1_return: number;
+  y3_return: number;
+  y5_return: number;
   plan_type: string;
   option_type: string;
   frequency: string;
