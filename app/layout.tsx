@@ -1,6 +1,6 @@
+import Footer from "@/components/Footer";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { ThemeProvider } from "@/utils/ThemeProvider";
 
 export const metadata = {
@@ -15,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <Navbar />
           {children}
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

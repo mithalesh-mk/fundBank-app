@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import fundService from "@/services/fundService";
 import IntradayChart from "@/components/IntradayChart";
-import FundDetailsCard from "@/components/FundDetailsCard";
+import ReturnCalculator from "@/components/ReturnCalculator";
+
 
 const ranges = [
   { label: "1M", days: 30 },
@@ -32,6 +33,32 @@ export default function Graph() {
   const [loading, setLoading] = useState(true);
   const [schemeName, setSchemeName] = useState("");
   const [fundMeta, setFundMeta] = useState<FundMeta | null>(null);
+  const [expectedCagr, setExpectedCagr] = useState<number | null>(null);
+
+  
+
+
+  const calculateExpectedCagr = () => {
+    try {
+      const oneY = allData["1Y"];
+      if (!oneY || oneY.length === 0) return null;
+  
+      const navStart = oneY[0]?.nav;
+      const navEnd = oneY[oneY.length - 1]?.nav;
+      console.log("CAGR calc navs:", navStart, navEnd);
+  
+      if (!navStart || !navEnd) return null;
+  
+      const years = 1; // because range = 1 year
+  
+      const cagr = ((navEnd / navStart) ** (1 / years) - 1) * 100;
+      return cagr;
+    } catch (err) {
+      console.error("CAGR calc error:", err);
+      return null;
+    }
+  };
+  
 
   const fetchAllRanges = async () => {
     if (!schemeId) return;
@@ -82,6 +109,13 @@ export default function Graph() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!loading && Object.keys(allData).length > 0) {
+      const cagr = calculateExpectedCagr();
+      setExpectedCagr(cagr);
+    }
+  }, [loading, allData]);
   
 
   useEffect(() => {
@@ -91,9 +125,13 @@ export default function Graph() {
   if (!schemeId) return <p>Invalid Scheme</p>;
 
   const data = allData[selectedRange];
+  const latestNav = data ? data[data.length - 1]?.nav : null;
+  console.log("Expected CAGR:", expectedCagr);
+  console.log("Latest NAV:", latestNav);
+
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-black dark:text-white pt-12 px-6">
+    <div className="min-h-screen dark:bg-gray-900 text-black dark:text-white pt-12 px-6">
   
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
   
@@ -128,7 +166,7 @@ export default function Graph() {
             )}
   
             {/* RANGE BUTTONS */}
-            <div className="absolute bottom-3 right-3 flex gap-2">
+            <div className="absolute bottom-1 right-3 flex gap-2">
               {ranges.map((r) => (
                 <button
                   key={r.label}
@@ -136,7 +174,7 @@ export default function Graph() {
                   className={`px-3 py-1 text-sm font-medium rounded-2xl border transition
                     ${
                       selectedRange === r.label
-                        ? "bg-blue-600 text-white border-blue-700"
+                        ? "bg-green-600 text-white border-green-700"
                         : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700"
                     }`}
                 >
@@ -149,12 +187,50 @@ export default function Graph() {
         </div>
   
         {/* RIGHT SECTION (card) */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-20">
-            <FundDetailsCard fundMeta={fundMeta} />
-          </div>
+        <div className="lg:col-span-1 space-y-8">      
+            <ReturnCalculator 
+              nav={latestNav ?? 10}
+              expectedCagr={expectedCagr ?? 12}
+            />
         </div>
-  
+              
+        <div className="lg:col-span-3 space-y-8 lg:absolute top-190 left-0 right-0 mb-10 px-6">
+          {/* EXPLORE MORE SECTION */}
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+              Explore More
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              
+              {/* News Card */}
+              <div className="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow hover:shadow-lg transition cursor-pointer">
+                <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-200">Mutual Fund News</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Latest announcements, market updates, and fund house news to keep you informed.
+                </p>
+              </div>
+
+              {/* Top Performing Funds */}
+              <div className="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow hover:shadow-lg transition cursor-pointer">
+                <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-200">Top Performing Funds</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Check out the top-performing mutual funds across various categories.
+                </p>
+              </div>
+
+              {/* Sector / Category Insights */}
+              <div className="p-6 rounded-2xl bg-white dark:bg-gray-800 shadow hover:shadow-lg transition cursor-pointer">
+                <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-200">Sector Insights</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Learn how different sectors are performing and explore allocation trends.
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );
