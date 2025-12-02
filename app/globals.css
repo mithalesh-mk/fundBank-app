@@ -52,6 +52,33 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+@layer components {
+  .form-label {
+    @apply block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-2 rounded-xl bg-white/70 dark:bg-gray-800/40 
+           border border-gray-300 dark:border-gray-700 
+           text-gray-900 dark:text-gray-100 shadow-sm focus:ring-2 
+           focus:ring-blue-500 focus:border-blue-500 outline-none;
+  }
+
+  .th {
+    @apply px-4 py-3 text-left font-semibold text-sm border-b border-gray-300 dark:border-gray-700;
+  }
+
+  .td {
+    @apply px-4 py-3 whitespace-nowrap;
+  }
+}
+@layer components {
+  .td-premium {
+    @apply px-4 py-3 border-b dark:border-gray-800 whitespace-nowrap;
+  }
+}
+
+
 
 .animate-fadeIn {
   animation: fadeIn 0.15s ease-out;

@@ -2,6 +2,8 @@
 import React, { useState, FC } from "react";
 import { BarChart3, Scale } from "lucide-react";
 import SPICalculator from "@/components/calculators/SIPCalculator";
+import SwpCalculator from "@/components/calculators/SWPCalculator";
+import LumpsumCalculator from "@/components/calculators/LumpsumCalculator";
 
 const tabs: string[] = [
   "SIP",
@@ -26,6 +28,10 @@ const CalculatorContent: FC<{ selectedTab: string }> = ({ selectedTab }) => {
   switch (selectedTab) {
     case "SIP":
       return <SPICalculator />;
+    case "SWP":
+      return <SwpCalculator />;
+    case "Lumpsum":
+      return <LumpsumCalculator />;
     default:
       return (
         <div className="p-6 text-center bg-gray-100 dark:bg-gray-700 rounded-xl">
