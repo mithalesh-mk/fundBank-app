@@ -15,6 +15,8 @@ const ranges = [
 ];
 
 export interface FundMeta {
+    y5_return: number;
+    nav : number;
     fund_house: string;
     scheme_type: string;
     scheme_category: string;
@@ -42,13 +44,17 @@ export default function Graph() {
     try {
       const oneY = allData["1Y"];
       if (!oneY || oneY.length === 0) return null;
+      console.log(fundMeta);
+
+      //nav5y=NavL/((5y/100)+1)
+      const navEnd = (fundMeta?.nav??1) / ((fundMeta?.y5_return??0/100) + 1);
   
-      const navStart = oneY[0]?.nav;
-      const navEnd = oneY[oneY.length - 1]?.nav;
+      //const navEnd = oneY[0]?.nav;
+      const navStart = fundMeta?.nav;
       console.log("CAGR calc navs:", navStart, navEnd);
   
       if (!navStart || !navEnd) return null;
-  
+      
       const years = 1; // because range = 1 year
   
       const cagr = ((navEnd / navStart) ** (1 / years) - 1) * 100;

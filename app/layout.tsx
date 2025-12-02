@@ -10,14 +10,16 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
+    <ThemeProvider>
     <html lang="en">
       <body className="bg-white dark:bg-gray-900 transition-colors">
-        <ThemeProvider>
+        
           <Navbar />
           {children}
           <Footer />
-        </ThemeProvider>
+        
       </body>
     </html>
+    </ThemeProvider>
   );
 }
