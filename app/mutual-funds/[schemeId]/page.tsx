@@ -38,7 +38,7 @@ export default function Graph() {
   const [expectedCagr, setExpectedCagr] = useState<number | null>(null);
 
   
-
+  
 
   const calculateExpectedCagr = () => {
     try {
