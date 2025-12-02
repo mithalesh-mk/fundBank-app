@@ -15,7 +15,7 @@ const returnKeys: (keyof Fund)[] = ["oneY", "threeY", "fiveY"];
 export default function MutualFunds() {
   const [selectedFilters, setSelectedFilters] = useState({});
   const [funds, setFunds] = useState<MutualFundScheme[]>([]);
-
+  console.log(process.env.NEXT_PUBLIC_APP_API_BASE_URL);
   useEffect(() => {
     const fetchFunds = async () => {
       try {
