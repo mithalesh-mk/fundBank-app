@@ -12,7 +12,7 @@ export const Navbar = () => {
   return (
     <>
       {/* NAVBAR */}
-      <header className="w-full sticky top-0 z-50 backdrop-blur-md bg-white dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 shadow-sm">
+      <header className="w-full sticky top-0 z-50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
           {/* LOGO */}
