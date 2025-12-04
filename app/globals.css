@@ -78,6 +78,30 @@
   }
 }
 
+/* Base track */
+.custom-slider {
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 5px;
+  background: #d1d5db; /* gray-300 */
+  outline: none;
+}
+
+/* Dark theme track */
+.dark .custom-slider {
+  background: #4b5563; /* gray-600 */
+}
+
+/* Thumb */
+.custom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #2b7fff; /* blue-600 */
+  cursor: pointer;
+}
+
 
 
 .animate-fadeIn {
