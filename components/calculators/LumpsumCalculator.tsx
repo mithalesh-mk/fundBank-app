@@ -1,166 +1,165 @@
 "use client";
 
-import React, { useState } from "react";
-import { CalendarDays, PlusCircle } from "lucide-react";
+import { useState } from "react";
+import { Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+const sliderFill = (value:number, min: number, max:number) => {
+  return ((value - min) * 100) / (max - min);
+};
 
 export default function LumpsumCalculator() {
-  const [funds, setFunds] = useState([{ fund: "", amount: "", start: "", end: "" }]);
+  const [amount, setAmount] = useState(25000);
+  const [rate, setRate] = useState(12);
+  const [years, setYears] = useState(10);
 
-  const addFund = () => {
-    if (funds.length === 4) return;
-    setFunds([...funds, { fund: "", amount: "", start: "", end: "" }]);
+  const investedAmount = amount;
+  const estReturn =
+    investedAmount * Math.pow(1 + rate / 100, years) - investedAmount;
+  const totalValue = investedAmount + estReturn;
+  
+  const badgeClass =
+    "min-w-[90px] text-center px-3 py-1 bg-[#59a0f7] dark:bg-[#59a0f7] text-white dark:text-black rounded-md";
+
+  const chartData = {
+    labels: ["Invested amount", "Est. returns"],
+    datasets: [
+      {
+        data: [investedAmount, estReturn],
+        backgroundColor: [
+          "rgba(200, 210, 255, 0.45)",
+          "#2b7fff",
+        ],
+        borderWidth: 0,
+      },
+    ],
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
-      
-      {/* PAGE TITLE */}
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-        Lump Sum Return Calculator
-      </h1>
+    <div className="max-w-full w-full mx-auto bg-white dark:bg-gray-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 transition">
 
-      {/* CARD WRAPPER */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 md:p-8 space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
-        {funds.map((item, index) => (
-          <div key={index} className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-              Fund {index + 1}
-            </h2>
+        {/* LEFT SECTION */}
+        <div className="space-y-8">
 
-            {/* FUND NAME & AMOUNT */}
-            <div className="grid md:grid-cols-2 gap-6">
+          {/* Total investment */}
+          <div>
+            <p className="text-gray-700 dark:text-gray-300 mb-2 font-medium">
+              Total investment
+            </p>
+            <div className="flex items-center justify-between gap-4">
+            <input
+              type="range"
+              min="1000"
+              max="200000"
+              step="1000"
+              value={amount}
+              onChange={(e) => setAmount(Number(e.target.value))}
+              className="w-full custom-slider"
+              style={{
+                background: `linear-gradient(to right, #2b7fff ${sliderFill(
+                  amount,
+                  1000,
+                  200000
+                )}%, #4b5563 ${sliderFill(amount, 1000, 200000)}%)`,
+              }}
+            />
 
-              <div className="flex flex-col">
-                <label className="text-sm font-medium mb-1">Fund Name</label>
-                <input
-                  type="text"
-                  placeholder="HSBC Value Fund Reg Gr"
-                  className="input-premium"
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <label className="text-sm font-medium mb-1">Enter Amount</label>
-                <input
-                  type="number"
-                  placeholder="100000"
-                  className="input-premium"
-                />
-              </div>
+              <span className={badgeClass}>₹{amount.toLocaleString()}</span>
             </div>
-
-            {/* DATES */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="flex flex-col">
-                <label className="text-sm font-medium mb-1">Select Start Date</label>
-                <input type="date" className="input-premium" />
-              </div>
-
-              <div className="flex flex-col">
-                <label className="text-sm font-medium mb-1">Select End Date</label>
-                <input type="date" className="input-premium" />
-              </div>
-            </div>
-
           </div>
-        ))}
 
-        {/* ADD FUND */}
-        {funds.length < 4 && (
-          <button
-            onClick={addFund}
-            className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-medium hover:opacity-80"
-          >
-            <PlusCircle size={18} /> Add another fund (upto 4)
-          </button>
-        )}
+          {/* Expected return */}
+          <div>
+            <p className="text-gray-700 dark:text-gray-300 mb-2 font-medium">
+              Expected return rate (p.a)
+            </p>
+            <div className="flex items-center justify-between gap-4">
+              <input
+                type="range"
+                min="1"
+                max="25"
+                value={rate}
+                onChange={(e) => setRate(Number(e.target.value))}
+                className="custom-slider w-full"
+                style={{
+                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
+                    rate,
+                    1,
+                    25
+                  )}%, #4b5563 ${sliderFill(rate, 1, 25)}%)`,
+                }}
+              />
+              <span className={badgeClass}>{rate}%</span>
+            </div>
+          </div>
 
-        {/* PREFILL */}
-        <div className="flex items-center gap-2">
-          <input type="checkbox" className="w-4 h-4" />
-          <span className="text-sm">Prefill start date with inception date</span>
+          {/* Time period */}
+          <div>
+            <p className="text-gray-700 dark:text-gray-300 mb-2 font-medium">
+              Time period
+            </p>
+            <div className="flex items-center justify-between gap-4">
+              <input
+                type="range"
+                min="1"
+                max="30"
+                value={years}
+                onChange={(e) => setYears(Number(e.target.value))}
+                className="custom-slider w-full"
+                style={{
+                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
+                    years,
+                    1,
+                    30
+                  )}%, #4b5563 ${sliderFill(years, 1, 30)}%)`,
+                }
+              }
+              />
+              <span className={badgeClass}>{years} Yr</span>
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div className="pt-4 space-y-1">
+            <p className="text-gray-600 dark:text-gray-400">
+              Invested amount{" "}
+              <span className="float-right font-semibold">
+                ₹{investedAmount.toLocaleString()}
+              </span>
+            </p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Est. returns{" "}
+              <span className="float-right font-semibold">
+                ₹{Math.round(estReturn).toLocaleString()}
+              </span>
+            </p>
+            <p className="text-gray-900 dark:text-gray-200 text-lg font-bold">
+              Total value{" "}
+              <span className="float-right">
+                ₹{Math.round(totalValue).toLocaleString()}
+              </span>
+            </p>
+          </div>
+
+          
         </div>
 
-        {/* SUBMIT */}
-        <button className="px-8 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-lg font-semibold">
-          Submit
-        </button>
+        {/* RIGHT CHART */}
+        <div className="flex justify-center items-center">
+          <div className="w-60 h-60 md:w-72 md:h-72">
+            <Doughnut data={chartData} />
+          </div>
+        </div>
       </div>
-
-    {/* SUMMARY TABLE */}
-    <div className="mt-12">
-
-        <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold">Summary</h2>
-            <button className="px-4 py-2 bg-emerald-500 text-white text-sm rounded-lg hover:bg-emerald-600">
-            Download Result
-            </button>
-        </div>
-
-        <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
-            <table className="min-w-full text-sm">
-            <thead className="bg-gray-100 dark:bg-gray-800">
-                <tr>
-                {[
-                    "Scheme Name",
-                    "AMC Name",
-                    "Category",
-                    "Launch Date",
-                    "Amount Invested",
-                    "Value on End Date",
-                    "Profit",
-                    "CAGR (%)",
-                    "Absolute (%)",
-                ].map((h) => (
-                    <th
-                    key={h}
-                    className="px-4 py-3 font-semibold text-left border-b dark:border-gray-700 whitespace-nowrap"
-                    >
-                    {h}
-                    </th>
-                ))}
-                </tr>
-            </thead>
-
-            <tbody>
-                {/* MF Row */}
-                <tr className="text-gray-800 dark:text-gray-200">
-                <td className="td-premium text-indigo-600">HSBC Value Fund Reg Gr</td>
-                <td className="td-premium">HSBCMF</td>
-                <td className="td-premium">Equity: Value</td>
-                <td className="td-premium">01-01-2013</td>
-                <td className="td-premium">1,00,000</td>
-                <td className="td-premium">4,49,162</td>
-                <td className="td-premium">3,49,162</td>
-                <td className="td-premium">16.19</td>
-                <td className="td-premium">349.16</td>
-                </tr>
-
-                {/* Benchmark Rows */}
-                {[
-                ["NIFTY 500 TRI", "-", "-", "01-01-1995", "3,98,374", "2,98,374", "14.81", "298.37"],
-                ["Fixed Deposit", "-", "-", "-", "1,84,232", "84,232", "6.3", "84.23"],
-                ["Gold", "-", "-", "-", "5,15,113", "4,15,113", "17.8", "415.11"],
-                ["PPF", "-", "-", "-", "2,05,593", "1,05,593", "7.47", "105.59"],
-                ].map((r, i) => (
-                <tr key={i} className="bg-yellow-50/40 dark:bg-yellow-900/10">
-                    <td className="td-premium font-medium">{r[0]}</td>
-                    <td className="td-premium">-</td>
-                    <td className="td-premium">-</td>
-                    <td className="td-premium">{r[3]}</td>
-                    <td className="td-premium">{r[4]}</td>
-                    <td className="td-premium">{r[5]}</td>
-                    <td className="td-premium">{r[6]}</td>
-                    <td className="td-premium">{r[7]}</td>
-                    <td className="td-premium">{r[7]}</td>
-                </tr>
-                ))}
-            </tbody>
-            </table>
-        </div>
-        
-    </div>
     </div>
   );
 }

@@ -6,21 +6,15 @@ import SwpCalculator from "@/components/calculators/SWPCalculator";
 import LumpsumCalculator from "@/components/calculators/LumpsumCalculator";
 
 const tabs: string[] = [
-  "SIP",
-  "Lumpsum",
-  "SWP",
-  "CAGR",
-  "XIRR",
-  "Sharpe Ratio",
-  "Stock CAGR",
-  "Intrinsic Value",
-  "Dividend Yield",
-  "P/E Valuation",
-  "Stop Loss / Target",
-  "Position Sizing",
-  "Average Buy Price",
-  "ROI",
-  "Expense Ratio Impact",
+  "Mutual Funds SIP",
+  "Retirement Calculator",
+  "⁠SWP Calculator",
+  "EMI vs SIP Calculator",
+  "⁠Children Education",
+  "Child Marriage Calculator",
+  "Lumpsum Calculator",
+  "SIP Need Calculator",
+  "⁠Capital Gain Calculator",
 ];
 
 // --- Content Switcher ---
@@ -30,7 +24,7 @@ const CalculatorContent: FC<{ selectedTab: string }> = ({ selectedTab }) => {
       return <SPICalculator />;
     case "SWP":
       return <SwpCalculator />;
-    case "Lumpsum":
+    case "Lumpsum Calculator":
       return <LumpsumCalculator />;
     default:
       return (
@@ -106,7 +100,7 @@ const Calculators: FC = () => {
                 className={`w-full text-left px-4 py-2 rounded-lg text-sm transition duration-150
                   ${
                     selectedTab === tab
-                      ? "bg-blue-600 text-white shadow-md font-semibold"
+                      ? "bg-blue-500 text-white shadow-md font-semibold"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                   }`}
               >
@@ -119,18 +113,12 @@ const Calculators: FC = () => {
         {/* ------------------ RIGHT CALCULATOR PANEL ------------------ */}
         <main className="flex-1 flex flex-col">
           {/* Desktop header */}
-          <div className="hidden md:flex flex-col items-center text-center mb-4">
+          <div className="hidden md:flex flex-col mb-4">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Financial Calculators
+              {selectedTab}
             </h1>
-            <p className="mt-2 text-base opacity-90 text-gray-600 dark:text-gray-300 max-w-xl">
-              Explore a wide range of tools to help you plan your investments, analyze returns, and make smarter financial decisions.
-            </p>
           </div>
-
-
-            <CalculatorContent selectedTab={selectedTab} />
-          
+            <CalculatorContent selectedTab={selectedTab} />         
         </main>
       </div>
     </div>
