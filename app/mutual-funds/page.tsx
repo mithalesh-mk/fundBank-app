@@ -1,7 +1,7 @@
 "use client";
 
 import FilterBar from "@/components/FilterBar";
-import { MutualFundScheme } from "@/services/fundService";
+import fundService, { MutualFundScheme } from "@/services/fundService";
 import React, { useState, useRef, useEffect } from "react";
 
 export default function MutualFunds() {
@@ -13,38 +13,38 @@ export default function MutualFunds() {
   const observerTarget = useRef<HTMLDivElement>(null);
 
   // Fetch 50 funds at a time
-  const fetchFunds = async () => {
-    if (loading || !hasMore) return;
+ const fetchFunds = async () => {
+  if (loading || !hasMore) return;
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const res = await fetch(`http://localhost:8080/funds/allfunds?page=${page}&limit=30`);
-      const json = await res.json();
+  try {
+    // This returns MutualFundScheme[]
+    const newFunds = await fundService.getAllFunds(page, 30);
 
-      if (!json.success) {
-        console.error("API error:", json.data);
-        setHasMore(false);
-        setLoading(false);
-        return;
-      }
-
-      const newFunds = json.data; // array of 50 items
-
-      setFunds(prev => [...prev, ...newFunds]);
-
-      if (newFunds.length < 30) {
-        setHasMore(false); // no more pages
-      } else {
-        setPage(prev => prev + 1);
-      }
-
-    } catch (err) {
-      console.error("Fetch error:", err);
+    // If server returns empty array → stop loading
+    if (newFunds.length === 0) {
+      setHasMore(false);
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
-  };
+    setFunds(prev => [...prev, ...newFunds]);
+
+    // If less than limit → last page
+    if (newFunds.length < 30) {
+      setHasMore(false);
+    } else {
+      setPage(prev => prev + 1);
+    }
+
+  } catch (err) {
+    console.error("Fetch error:", err);
+    setHasMore(false);
+  }
+
+  setLoading(false);
+};
 
   // Load first page
   useEffect(() => {
