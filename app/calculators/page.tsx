@@ -4,6 +4,7 @@ import { BarChart3, Scale } from "lucide-react";
 import SPICalculator from "@/components/calculators/SIPCalculator";
 import SwpCalculator from "@/components/calculators/SWPCalculator";
 import LumpsumCalculator from "@/components/calculators/LumpsumCalculator";
+import RetirementCalculator from "@/components/calculators/RetirementCalculator";
 
 const tabs: string[] = [
   "Mutual Funds SIP",
@@ -20,12 +21,14 @@ const tabs: string[] = [
 // --- Content Switcher ---
 const CalculatorContent: FC<{ selectedTab: string }> = ({ selectedTab }) => {
   switch (selectedTab) {
-    case "SIP":
+    case "Mutual Funds SIP":
       return <SPICalculator />;
-    case "SWP":
+    case "⁠SWP Calculator":
       return <SwpCalculator />;
     case "Lumpsum Calculator":
       return <LumpsumCalculator />;
+    case "Retirement Calculator":
+      return <RetirementCalculator />
     default:
       return (
         <div className="p-6 text-center bg-gray-100 dark:bg-gray-700 rounded-xl">

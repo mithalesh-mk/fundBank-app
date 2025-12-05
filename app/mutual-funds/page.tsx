@@ -70,6 +70,8 @@ export default function MutualFunds() {
     };
   }, [hasMore, loading]);
 
+  console.log(process.env.NEXT_PUBLIC_APP_API_BASE_URL);
+
   return (
     <div className="min-h-screen px-4 md:px-16 py-10">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
