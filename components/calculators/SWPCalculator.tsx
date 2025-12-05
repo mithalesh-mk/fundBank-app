@@ -1,220 +1,201 @@
 "use client";
 
 import { useState } from "react";
+import { Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-export default function SwpCalculator() {
-  const [form, setForm] = useState({
-    amc: "",
-    scheme: "",
-    lumpsum: "",
-    withdrawAmount: "",
-    withdrawDate: "10",
-    investDate: "",
-    swpStart: "",
-    swpEnd: "",
-    periodYears: "",
-    frequency: "Monthly",
-  });
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-  const handleChange = (e: any) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+const sliderFill = (value: number, min: number, max: number) => {
+  return ((value - min) * 100) / (max - min);
+};
+
+export default function SWPCalculator() {
+  const [initial, setInitial] = useState(1000000); // starting corpus
+  const [withdraw, setWithdraw] = useState(20000); // monthly SWP
+  const [rate, setRate] = useState(10);
+  const [years, setYears] = useState(10);
+
+  const badgeClass =
+    "min-w-[90px] text-center px-3 py-1 bg-[#59a0f7] dark:bg-[#59a0f7] text-white dark:text-black rounded-md";
+
+  const months = years * 12;
+
+  // SWP Formula
+  function calculateFinalCorpus(
+    initial: number,
+    monthlyWithdraw: number,
+    years: number,
+    annualRate: number
+  ) {
+    const r = annualRate / 12 / 100;
+    const n = years * 12;
+
+    let balance = initial;
+
+    for (let i = 0; i < n; i++) {
+      balance = (balance - monthlyWithdraw) * (1 + r);
+    }
+    return balance;
+  }
+
+  const totalInvestment = initial;
+  const totalWithdrawal = withdraw * months;
+  const finalValue = calculateFinalCorpus(initial, withdraw, years, rate);
+
+  const chartData = {
+    labels: ["Total Withdrawal", "Final Value"],
+    datasets: [
+      {
+        data: [totalWithdrawal, finalValue],
+        backgroundColor: ["rgba(200, 210, 255, 0.45)", "#2b7fff"],
+        borderWidth: 0,
+      },
+    ],
   };
 
   return (
-    <div className="min-h-screen w-full px-4 py-10 bg-gray-50 dark:bg-gray-900 transition-colors">
-      {/* Title */}
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-8">
-        Mutual Fund SWP Calculator
-      </h1>
+    <div className="max-w-full w-full mx-auto bg-white dark:bg-gray-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 transition">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        
+        {/* LEFT SECTION */}
+        <div className="space-y-8">
 
-      {/* Main Card */}
-      <div className="max-w-5xl mx-auto bg-white/70 dark:bg-gray-900/40 backdrop-blur-xl 
-                      border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-6 md:p-8">
-
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-          {/* AMC */}
+          {/* Initial Corpus */}
           <div>
-            <label className="form-label">Select AMC</label>
-            <select
-              name="amc"
-              value={form.amc}
-              onChange={handleChange}
-              className="form-input"
-            >
-              <option value="">Select</option>
-              <option>Mirae Asset Mutual Fund</option>
-              <option>Aditya Birla Sun Life</option>
-              <option>HDFC Mutual Fund</option>
-            </select>
+            <p className="text-gray-700 dark:text-gray-300 mb-2 font-medium">Initial Investment</p>
+            <div className="flex items-center justify-between gap-4">
+              <input
+                type="range"
+                min="10000"
+                max="10000000"
+                step="5000"
+                value={initial}
+                onChange={(e) => setInitial(Number(e.target.value))}
+                className="w-full custom-slider"
+                style={{
+                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
+                    initial,
+                    10000,
+                    10000000
+                  )}%, #4b5563 ${sliderFill(initial, 10000, 10000000)}%)`,
+                }}
+              />
+              <span className={badgeClass}>₹{initial.toLocaleString()}</span>
+            </div>
           </div>
 
-          {/* Scheme */}
+          {/* Monthly Withdrawal */}
           <div>
-            <label className="form-label">Select Scheme</label>
-            <select
-              name="scheme"
-              value={form.scheme}
-              onChange={handleChange}
-              className="form-input"
-            >
-              <option value="">Select</option>
-              <option>Mirae Asset Large Cap Gr</option>
-            </select>
+            <p className="text-gray-700 dark:text-gray-300 mb-2 font-medium">Monthly Withdrawal</p>
+            <div className="flex items-center justify-between gap-4">
+              <input
+                type="range"
+                min="500"
+                max="500000"
+                step="500"
+                value={withdraw}
+                onChange={(e) => setWithdraw(Number(e.target.value))}
+                className="w-full custom-slider"
+                style={{
+                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
+                    withdraw,
+                    500,
+                    500000
+                  )}%, #4b5563 ${sliderFill(withdraw, 500, 500000)}%)`,
+                }}
+              />
+              <span className={badgeClass}>₹{withdraw.toLocaleString()}</span>
+            </div>
           </div>
 
-          {/* Lumpsum */}
+          {/* Expected Return */}
           <div>
-            <label className="form-label">Lumpsum Amount</label>
-            <input
-              name="lumpsum"
-              type="number"
-              value={form.lumpsum}
-              onChange={handleChange}
-              className="form-input"
-              placeholder="1000000"
-            />
+            <p className="text-gray-700 dark:text-gray-300 mb-2 font-medium">
+              Expected return rate (p.a)
+            </p>
+            <div className="flex items-center justify-between gap-4">
+              <input
+                type="range"
+                min="1"
+                max="20"
+                step="0.1"
+                value={rate}
+                onChange={(e) => setRate(Number(e.target.value))}
+                className="w-full custom-slider"
+                style={{
+                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
+                    rate,
+                    1,
+                    20
+                  )}%, #4b5563 ${sliderFill(rate, 1, 20)}%)`,
+                }}
+              />
+              <span className={badgeClass}>{rate}%</span>
+            </div>
           </div>
 
-          {/* Investment Date */}
+          {/* Time Period */}
           <div>
-            <label className="form-label">Investment Date</label>
-            <input
-              type="date"
-              name="investDate"
-              value={form.investDate}
-              onChange={handleChange}
-              className="form-input"
-            />
+            <p className="text-gray-700 dark:text-gray-300 mb-2 font-medium">Time period</p>
+            <div className="flex items-center justify-between gap-4">
+              <input
+                type="range"
+                min="1"
+                max="30"
+                value={years}
+                onChange={(e) => setYears(Number(e.target.value))}
+                className="w-full custom-slider"
+                style={{
+                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
+                    years,
+                    1,
+                    30
+                  )}%, #4b5563 ${sliderFill(years, 1, 30)}%)`,
+                }}
+              />
+              <span className={badgeClass}>{years} Yr</span>
+            </div>
           </div>
 
-          {/* Withdrawal Amount */}
-          <div>
-            <label className="form-label">Withdrawal Amount</label>
-            <input
-              name="withdrawAmount"
-              type="number"
-              value={form.withdrawAmount}
-              onChange={handleChange}
-              className="form-input"
-              placeholder="3000"
-            />
-          </div>
+          {/* Summary */}
+          <div className="pt-4 space-y-1">
+            <p className="text-gray-600 dark:text-gray-400">
+              Total investment
+              <span className="float-right font-semibold">
+                ₹{totalInvestment.toLocaleString()}
+              </span>
+            </p>
 
-          {/* SWP Date */}
-          <div>
-            <label className="form-label">Select SWP Date</label>
-            <select
-              name="withdrawDate"
-              value={form.withdrawDate}
-              onChange={handleChange}
-              className="form-input"
-            >
-              <option>1</option>
-              <option>5</option>
-              <option>10</option>
-              <option>15</option>
-              <option>25</option>
-            </select>
-          </div>
+            <p className="text-gray-600 dark:text-gray-400">
+              Total withdrawal
+              <span className="float-right font-semibold">
+                ₹{totalWithdrawal.toLocaleString()}
+              </span>
+            </p>
 
-          {/* Frequency */}
-          <div>
-            <label className="form-label">Select Period</label>
-            <select
-              name="frequency"
-              value={form.frequency}
-              onChange={handleChange}
-              className="form-input"
-            >
-              <option value="Monthly">Monthly</option>
-            </select>
-          </div>
-
-          {/* SWP Start Date */}
-          <div>
-            <label className="form-label">SWP Start Date</label>
-            <input
-              type="date"
-              name="swpStart"
-              value={form.swpStart}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-
-          {/* SWP End Date */}
-          <div>
-            <label className="form-label">SWP End Date</label>
-            <input
-              type="date"
-              name="swpEnd"
-              value={form.swpEnd}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-
-          {/* Period in Years */}
-          <div>
-            <label className="form-label">Period (in Years)</label>
-            <input
-              type="number"
-              name="periodYears"
-              value={form.periodYears}
-              onChange={handleChange}
-              className="form-input"
-              placeholder="eg 5"
-            />
+            <p className="text-gray-900 dark:text-gray-200 text-lg font-bold">
+              Final value
+              <span className="float-right">
+                ₹{Math.round(finalValue).toLocaleString()}
+              </span>
+            </p>
           </div>
         </div>
 
-        {/* Submit */}
-        <div className="mt-8 text-center">
-          <button className="px-8 py-3 rounded-xl font-semibold bg-blue-600 hover:bg-blue-700 
-                             text-white shadow-md">
-            Submit
-          </button>
+        {/* RIGHT SECTION (CHART) */}
+        <div className="flex justify-center items-center">
+          <div className="w-60 h-60 md:w-72 md:h-72">
+            <Doughnut data={chartData} />
+          </div>
         </div>
-      </div>
 
-      {/* Result Table */}
-      <div className="max-w-5xl mx-auto mt-10">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          Systematic Withdrawal Plan Calculator
-        </h2>
-
-        <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/40 backdrop-blur-xl">
-          <table className="w-full text-sm text-gray-700 dark:text-gray-300">
-            <thead className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
-              <tr>
-                <th className="th">Scheme</th>
-                <th className="th">AMC Name</th>
-                <th className="th">Withdrawal Period</th>
-                <th className="th">Installments</th>
-                <th className="th">Total Withdrawal</th>
-                <th className="th">Current Value</th>
-                <th className="th">Return (%)</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr className="border-t border-gray-200 dark:border-gray-800">
-                <td className="td">Mirae Asset Large Cap Gr</td>
-                <td className="td">MiraeMF</td>
-                <td className="td">20-08-2016 → 01-12-2025</td>
-                <td className="td">111</td>
-                <td className="td">3,33,000</td>
-                <td className="td">25,66,478</td>
-                <td className="td font-semibold text-green-500">13.41</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
   );
 }
-
-/* Extra Styles */
