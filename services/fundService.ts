@@ -45,14 +45,20 @@ class FundService {
     return res.data;
   }
 
-  async getAllFunds(page: number, limit: number): Promise<MutualFundScheme[]> {
+  async getAllFunds(page: number, limit: number, category: string[]) {
   const res = await axiosInstance.get<ApiResponse<MutualFundScheme[]>>(
-    `/funds/allfunds?page=${page}&limit=${limit}`
+    "/funds/allfunds",
+    {
+      params: {
+        page,
+        limit,
+        category: category
+      },
+    }
   );
 
   return res.data.data;
 }
-
 
 }
 
