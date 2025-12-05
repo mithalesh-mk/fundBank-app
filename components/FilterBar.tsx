@@ -120,7 +120,7 @@ export default function FiltersBar({ setFilters,applyFilters,filters}: FilterBar
 
     if (allSelected) {
       // remove all subcategories
-      newList = filters.category.filter((c) => !subs.includes(c));
+      newList = filters.category.filter((c:any) => !subs.includes(c));
     } else {
       // add missing subcategories
       const missing = subs.filter((c) => !filters.category.includes(c));
@@ -135,7 +135,7 @@ export default function FiltersBar({ setFilters,applyFilters,filters}: FilterBar
     const exists = filters.category.includes(sub);
 
     const updatedList = exists
-      ? filters.category.filter((c) => c !== sub)
+      ? filters.category.filter((c:any) => c !== sub)
       : [...filters.category, sub];
 
     const updated = { ...filters, category: updatedList };
@@ -288,7 +288,6 @@ export default function FiltersBar({ setFilters,applyFilters,filters}: FilterBar
         className="ml-auto text-sm text-gray-500 dark:text-gray-400 hover:underline"
         onClick={() => {
           setFilters({ category: [], fundhouse: '', tag: '' });
-          onFilterChange?.({ category: '', fundhouse: '', tag: '' });
         }}
       >
         Clear All
