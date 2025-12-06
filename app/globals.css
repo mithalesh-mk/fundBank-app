@@ -56,6 +56,27 @@
   }
 }
 
+
+.premium-input {
+  padding-right: 20px; /* space for % */
+}
+
+.premium-input::-webkit-inner-spin-button,
+.premium-input::-webkit-outer-spin-button {
+  margin-right: 18px; /* shift spinner so % looks clean */
+}
+
+.premium-input-container::after {
+  content: "fdfw";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280; /* gray-500 */
+  pointer-events: none;
+}
+
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }

@@ -1,20 +1,25 @@
 "use client";
-import React, { useState, FC } from "react";
+import React, { useState, FC, useEffect } from "react";
 import { BarChart3, Scale } from "lucide-react";
 import SPICalculator from "@/components/calculators/SIPCalculator";
 import SwpCalculator from "@/components/calculators/SWPCalculator";
 import LumpsumCalculator from "@/components/calculators/LumpsumCalculator";
 import RetirementCalculator from "@/components/calculators/RetirementCalculator";
+import SIPNeedCalculator from "@/components/calculators/SIPNeedCalculator";
+import EmiVsSipCalculator from "@/components/calculators/EmiVsSipCalculator";
+import ChildEducationCalculator from "@/components/calculators/ChildEducationCalculator";
+import ChildMarraigeCalculator from "@/components/calculators/ChildMarraigeCalculator";
+import SIPCalculator from "@/components/calculators/SIPCalculator";
 
 const tabs: string[] = [
   "Mutual Funds SIP",
   "Retirement Calculator",
   "⁠SWP Calculator",
   "EMI vs SIP Calculator",
-  "⁠Children Education",
   "Child Marriage Calculator",
   "Lumpsum Calculator",
   "SIP Need Calculator",
+  "⁠Children Education",
   "⁠Capital Gain Calculator",
 ];
 
@@ -29,18 +34,33 @@ const CalculatorContent: FC<{ selectedTab: string }> = ({ selectedTab }) => {
       return <LumpsumCalculator />;
     case "Retirement Calculator":
       return <RetirementCalculator />
+    case "SIP Need Calculator":
+      return <SIPNeedCalculator />;
+    case "EMI vs SIP Calculator":
+      return <EmiVsSipCalculator />;
+    case "⁠Children Education":
+      return <ChildEducationCalculator />;
+    case "Child Marriage Calculator":
+      return <ChildMarraigeCalculator />;
     default:
-      return (
-        <div className="p-6 text-center bg-gray-100 dark:bg-gray-700 rounded-xl">
-          <SPICalculator />
-        </div>
-      );
+      return <SIPCalculator />;
   }
 };
 
 const Calculators: FC = () => {
-  const [selectedTab, setSelectedTab] = useState<string>("SIP");
+  const [selectedTab, setSelectedTab] = useState<string>("Mutual Funds SIP");
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
+  
+  useEffect(() => {
+    // Load saved tab from localStorage on client side
+    const savedTab = localStorage.getItem("selectedCalculatorTab");
+    if (savedTab) setSelectedTab(savedTab);
+  }, []);
+  
+  useEffect(() => {
+    localStorage.setItem("selectedCalculatorTab", selectedTab);
+  }, [selectedTab]);
+  
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-black dark:text-white font-inter">
