@@ -27,6 +27,9 @@ export interface MutualFundScheme {
   y1_return: number;
   y3_return: number;
   y5_return: number;
+  cagr_1y: number;
+  cagr_3y: number;
+  cagr_5y: number;
   plan_type: string;
   option_type: string;
   frequency: string;
@@ -45,14 +48,17 @@ class FundService {
     return res.data;
   }
 
-  async getAllFunds(page: number, limit: number, category: string[]) {
+  async getAllFunds(page: number, limit: number, category: string[],fundhouse: string[], sortBy?: string, order?:number): Promise<MutualFundScheme[]> {
   const res = await axiosInstance.get<ApiResponse<MutualFundScheme[]>>(
     "/funds/allfunds",
     {
       params: {
         page,
         limit,
-        category: category
+        category,
+        fundhouse,
+        sortBy, 
+        order
       },
     }
   );
