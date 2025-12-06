@@ -185,13 +185,13 @@ export default function RetirementCalculator() {
       </div>
 
       {/* ---- SAVINGS OPTION ---- */}
-    <div className="space-y-3">
+    <div className="space-y-4 mt-3">
         <p className="font-medium mb-2">Do you have existing savings?</p>
 
         <div className="flex flex-col md:flex-row md:items-center md:gap-6 gap-3">
 
     {/* Radio buttons */}
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-6 mb-3">
       <label className="flex items-center gap-2 cursor-pointer">
         <input
           type="radio"
@@ -222,7 +222,7 @@ export default function RetirementCalculator() {
         <div>₹
       <input
         placeholder="10000"
-        className="mt-1 ml-2 md:mt-0 px-2 rounded-lg border w-[50%] md:w-64 dark:bg-gray-800"
+        className="ml-2 md:mt-0 mb-4 sm:mb-3 px-2 rounded-lg border w-[50%] md:w-64 dark:bg-gray-800"
         value={existingSavings}
         onChange={(e) => setExistingSavings(e.target.value)}
         />

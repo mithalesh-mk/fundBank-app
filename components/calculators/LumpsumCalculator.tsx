@@ -73,7 +73,16 @@ export default function LumpsumCalculator() {
               }}
             />
 
-              <span className={badgeClass}>₹{amount.toLocaleString()}</span>
+            ₹<input
+                min="1"
+                max="25"
+                value={amount}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  if (val >= 0 && val <= 200000) setAmount(val);
+                }}
+                className={`${badgeClass} w-16 text-center !px-0`}
+              />
             </div>
           </div>
 
@@ -98,7 +107,16 @@ export default function LumpsumCalculator() {
                   )}%, #4b5563 ${sliderFill(rate, 1, 25)}%)`,
                 }}
               />
-              <span className={badgeClass}>{rate}%</span>
+              %<input
+                min="1"
+                max="25"
+                value={rate}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  if (val >= 0 && val <= 25) setRate(val);
+                }}
+                className={`${badgeClass} w-16 text-center`}
+              />
             </div>
           </div>
 
@@ -124,7 +142,16 @@ export default function LumpsumCalculator() {
                 }
               }
               />
-              <span className={badgeClass}>{years} Yr</span>
+              yr<input
+                min="1"
+                max="30"
+                value={years}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  if (val >= 0 && val <= 30) setYears(val);
+                }}
+                className={`${badgeClass} w-16 text-center !px-0`}
+              />
             </div>
           </div>
 
