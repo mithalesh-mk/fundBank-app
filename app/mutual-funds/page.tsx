@@ -156,7 +156,7 @@ export default function MutualFunds() {
 
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden w-full">
         <div
-          className="md:block h-[800px] overflow-y-auto overflow-x-auto [&::-webkit-scrollbar]:w-2
+          className="md:block h-[calc(100vh-250px)] overflow-y-auto overflow-x-auto [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:rounded-full
   [&::-webkit-scrollbar-track]:bg-gray-100
   [&::-webkit-scrollbar-thumb]:rounded-full
