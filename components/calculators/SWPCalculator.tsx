@@ -1,200 +1,360 @@
 "use client";
 
-import { useState } from "react";
-import { Doughnut } from "react-chartjs-2";
+import React, { useState, useEffect } from "react";
 import {
-  Chart as ChartJS,
-  ArcElement,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
   Tooltip,
-  Legend,
-} from "chart.js";
+  ResponsiveContainer,
+} from "recharts";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+import { Moon, Sun, Download, Calendar as CalendarIcon } from "lucide-react";
+import fundService, { SchemeName } from "@/services/fundService";
 
-const sliderFill = (value: number, min: number, max: number) => {
-  return ((value - min) * 100) / (max - min);
-};
+// ---------------------------------------------------
+// AMC LIST
+// ---------------------------------------------------
+const amcList = [
+  "Aditya Birla Sun Life Mutual Fund",
+  "Angel One Mutual Fund",
+  "Axis Mutual Fund",
+  "Bajaj Finserv Mutual Fund",
+  "Bandhan Mutual Fund",
+  "Bank of India Mutual Fund",
+  "Baroda BNP Paribas Mutual Fund",
+  "Canara Robeco Mutual Fund",
+  "Capitalmind Mutual Fund",
+  "Choice Mutual Fund",
+  "DSP Mutual Fund",
+  "Edelweiss Mutual Fund",
+  "Franklin Templeton Mutual Fund",
+  "Groww Mutual Fund",
+  "HDFC Mutual Fund",
+  "HSBC Mutual Fund",
+  "Helios Mutual Fund",
+  "ICICI Prudential Mutual Fund",
+  "IL&FS Mutual Fund (IDF)",
+  "ITI Mutual Fund",
+  "Invesco Mutual Fund",
+  "JM Financial Mutual Fund",
+  "Jio BlackRock Mutual Fund",
+  "Kotak Mahindra Mutual Fund",
+  "LIC Mutual Fund",
+  "Mahindra Manulife Mutual Fund",
+  "Mirae Asset Mutual Fund",
+  "Motilal Oswal Mutual Fund",
+  "NJ Mutual Fund",
+  "Navi Mutual Fund",
+  "Nippon India Mutual Fund",
+  "Old Bridge Mutual Fund",
+  "PGIM India Mutual Fund",
+  "PPFAS Mutual Fund",
+  "Quantum Mutual Fund",
+  "SBI Mutual Fund",
+  "Samco Mutual Fund",
+  "Shriram Mutual Fund",
+  "Sundaram Mutual Fund",
+  "Tata Mutual Fund",
+  "Taurus Mutual Fund",
+  "The Wealth Company Mutual Fund",
+  "Trust Mutual Fund",
+  "UTI Mutual Fund",
+  "Unifi Mutual Fund",
+  "Union Mutual Fund",
+  "WhiteOak Capital Mutual Fund",
+  "Zerodha Mutual Fund",
+  "quant Mutual Fund",
+];
 
 export default function SWPCalculator() {
-  const [initial, setInitial] = useState(1000000); // starting corpus
-  const [withdraw, setWithdraw] = useState(20000); // monthly SWP
-  const [rate, setRate] = useState(10);
-  const [years, setYears] = useState(10);
+  const [darkMode, setDarkMode] = useState(false);
+  const [result, setResult] = useState<any>(null);
 
-  const badgeClass =
-    "min-w-[90px] text-center px-3 py-1 bg-[#59a0f7] dark:bg-[#59a0f7] text-white dark:text-black rounded-md";
+  const [schemeNames, setSchemeNames] = useState<SchemeName[]>([]);
 
-  const months = years * 12;
+  const [formData, setFormData] = useState({
+    amc: "Mirae Asset Mutual Fund",
+    scheme: "Mirae Asset Large Cap Gr",
+    lumpsum: 1000000,
+    investDate: "2016-08-20",
+    withdrawal: 3000,
+    swpDate: "10",
+    periodType: "Monthly",
+    swpStartDate: "2016-08-20",
+    swpEndDate: "2025-12-07",
+    years: "",
+  });
 
-  // SWP Formula
-  function calculateFinalCorpus(
-    initial: number,
-    monthlyWithdraw: number,
-    years: number,
-    annualRate: number
-  ) {
-    const r = annualRate / 12 / 100;
-    const n = years * 12;
-
-    let balance = initial;
-
-    for (let i = 0; i < n; i++) {
-      balance = (balance - monthlyWithdraw) * (1 + r);
+  const fetchSchemeNames = async (amc: string) => {
+    try {
+      const res = await fundService.getSchemeNames(amc);
+      setSchemeNames(res);
+    } catch (e) {
+      console.error("Error loading schemes", e);
     }
-    return balance;
-  }
-
-  const totalInvestment = initial;
-  const totalWithdrawal = withdraw * months;
-  const finalValue = calculateFinalCorpus(initial, withdraw, years, rate);
-
-  const chartData = {
-    labels: ["Total Withdrawal", "Final Value"],
-    datasets: [
-      {
-        data: [totalWithdrawal, finalValue],
-        backgroundColor: ["rgba(200, 210, 255, 0.45)", "#2b7fff"],
-        borderWidth: 0,
-      },
-    ],
   };
 
+  useEffect(() => {
+    fetchSchemeNames(formData.amc);
+  }, [formData.amc]);
+
+  const handleInputChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const DateInput = ({ label, name, value }: any) => (
+    <div className="space-y-2">
+      <label className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+        {label}
+      </label>
+
+      <div className="relative">
+        <CalendarIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
+        <input
+          type="date"
+          name={name}
+          value={value}
+          onChange={handleInputChange}
+          className="w-full pl-10 p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
+                     bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+        />
+      </div>
+    </div>
+  );
+
   return (
-    <div className="max-w-full w-full mx-auto bg-white dark:bg-gray-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 transition">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+    <div
+      className="min-h-screen transition-colors duration-300 ${
+        dark:bg-gray-900 dark:text-gray-100 text-gray-900"
+    >
+      <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
         
-        {/* LEFT SECTION */}
-        <div className="space-y-8">
+        {/* ======================== INPUT BOX ======================== */}
+        <div className="rounded-xl border border-gray-200 dark:border-blue-900 
+                        bg-gray-50 dark:bg-gray-800 p-6 transition-all shadow-md">
 
-          {/* Initial Corpus */}
-          <div>
-            <p className="text-gray-700 dark:text-gray-300 mb-2 font-medium">Initial Investment</p>
-            <div className="flex items-center justify-between gap-4">
-              <input
-                type="range"
-                min="10000"
-                max="10000000"
-                step="5000"
-                value={initial}
-                onChange={(e) => setInitial(Number(e.target.value))}
-                className="w-full custom-slider"
-                style={{
-                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
-                    initial,
-                    10000,
-                    10000000
-                  )}%, #4b5563 ${sliderFill(initial, 10000, 10000000)}%)`,
-                }}
-              />
-              <span className={badgeClass}>₹{initial.toLocaleString()}</span>
+          <h2 className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-6">
+            SWP Calculator
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            {/* AMC */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                Select AMC
+              </label>
+              <select
+                name="amc"
+                value={formData.amc}
+                onChange={handleInputChange}
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                {amcList.map((amc, index) => (
+                  <option key={index} value={amc}>
+                    {amc}
+                  </option>
+                ))}
+              </select>
             </div>
+
+            {/* Scheme */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                Select Scheme
+              </label>
+              <select
+                name="scheme"
+                value={formData.scheme}
+                onChange={handleInputChange}
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                {schemeNames?.map((s, index) => (
+                  <option key={index} value={s.scheme_name}>
+                    {s.scheme_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Lumpsum */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                Lumpsum Amount
+              </label>
+              <input
+                name="lumpsum"
+                value={formData.lumpsum}
+                onChange={handleInputChange}
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+
+            <DateInput label="Investment Date" name="investDate" value={formData.investDate} />
+
+            {/* Withdrawal */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                Withdrawal Amount
+              </label>
+              <input
+                name="withdrawal"
+                value={formData.withdrawal}
+                onChange={handleInputChange}
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+
+            {/* SWP Date */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                SWP Date
+              </label>
+              <select
+                name="swpDate"
+                value={formData.swpDate}
+                onChange={handleInputChange}
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                {[...Array(31)].map((_, i) => (
+                  <option key={i} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Period Type */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                Select Period
+              </label>
+              <select
+                name="periodType"
+                value={formData.periodType}
+                onChange={handleInputChange}
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                <option>Monthly</option>
+                <option>Quarterly</option>
+                <option>Yearly</option>
+              </select>
+            </div>
+
+            <DateInput label="SWP Start Date" name="swpStartDate" value={formData.swpStartDate} />
+            <DateInput label="SWP End Date" name="swpEndDate" value={formData.swpEndDate} />
           </div>
 
-          {/* Monthly Withdrawal */}
-          <div>
-            <p className="text-gray-700 dark:text-gray-300 mb-2 font-medium">Monthly Withdrawal</p>
-            <div className="flex items-center justify-between gap-4">
-              <input
-                type="range"
-                min="500"
-                max="500000"
-                step="500"
-                value={withdraw}
-                onChange={(e) => setWithdraw(Number(e.target.value))}
-                className="w-full custom-slider"
-                style={{
-                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
-                    withdraw,
-                    500,
-                    500000
-                  )}%, #4b5563 ${sliderFill(withdraw, 500, 500000)}%)`,
-                }}
-              />
-              <span className={badgeClass}>₹{withdraw.toLocaleString()}</span>
-            </div>
-          </div>
-
-          {/* Expected Return */}
-          <div>
-            <p className="text-gray-700 dark:text-gray-300 mb-2 font-medium">
-              Expected return rate (p.a)
-            </p>
-            <div className="flex items-center justify-between gap-4">
-              <input
-                type="range"
-                min="1"
-                max="20"
-                step="0.1"
-                value={rate}
-                onChange={(e) => setRate(Number(e.target.value))}
-                className="w-full custom-slider"
-                style={{
-                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
-                    rate,
-                    1,
-                    20
-                  )}%, #4b5563 ${sliderFill(rate, 1, 20)}%)`,
-                }}
-              />
-              <span className={badgeClass}>{rate}%</span>
-            </div>
-          </div>
-
-          {/* Time Period */}
-          <div>
-            <p className="text-gray-700 dark:text-gray-300 mb-2 font-medium">Time period</p>
-            <div className="flex items-center justify-between gap-4">
-              <input
-                type="range"
-                min="1"
-                max="30"
-                value={years}
-                onChange={(e) => setYears(Number(e.target.value))}
-                className="w-full custom-slider"
-                style={{
-                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
-                    years,
-                    1,
-                    30
-                  )}%, #4b5563 ${sliderFill(years, 1, 30)}%)`,
-                }}
-              />
-              <span className={badgeClass}>{years} Yr</span>
-            </div>
-          </div>
-
-          {/* Summary */}
-          <div className="pt-4 space-y-1">
-            <p className="text-gray-600 dark:text-gray-400">
-              Total investment
-              <span className="float-right font-semibold">
-                ₹{totalInvestment.toLocaleString()}
-              </span>
-            </p>
-
-            <p className="text-gray-600 dark:text-gray-400">
-              Total withdrawal
-              <span className="float-right font-semibold">
-                ₹{totalWithdrawal.toLocaleString()}
-              </span>
-            </p>
-
-            <p className="text-gray-900 dark:text-gray-200 text-lg font-bold">
-              Final value
-              <span className="float-right">
-                ₹{Math.round(finalValue).toLocaleString()}
-              </span>
-            </p>
+          <div className="pt-8">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-lg shadow transition-all active:scale-95">
+              Submit
+            </button>
           </div>
         </div>
 
-        {/* RIGHT SECTION (CHART) */}
-        <div className="flex justify-center items-center">
-          <div className="w-60 h-60 md:w-72 md:h-72">
-            <Doughnut data={chartData} />
-          </div>
-        </div>
+        {/* ======================== RESULTS ======================== */}
+        {result && (
+          <>
+            <div className="rounded-xl border border-gray-200 dark:border-blue-900 
+                            bg-gray-50 dark:bg-gray-800 p-6 flex flex-col gap-6 transition-all">
 
+              <h2 className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                SWP Calculator Result
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
+                  <p className="text-gray-500 dark:text-gray-300 text-xs">Installments</p>
+                  <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                    {result.installments}
+                  </h3>
+                </div>
+
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
+                  <p className="text-gray-500 dark:text-gray-300 text-xs">Total Withdrawal</p>
+                  <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                    ₹ {result.totalWithdrawn.toLocaleString("en-IN")}
+                  </h3>
+                </div>
+
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
+                  <p className="text-gray-500 dark:text-gray-300 text-xs">Return (%)</p>
+                  <h3 className="font-semibold text-green-600">
+                    {result.returnPerc}%
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            {/* Chart Box */}
+            <div className="rounded-xl border border-gray-200 dark:border-blue-900 
+                            bg-gray-50 dark:bg-gray-800 p-6 transition-all">
+
+              <h3 className="text-lg font-medium text-blue-600 dark:text-blue-400 text-center mb-4">
+                Value Movement – {formData.scheme}
+              </h3>
+
+              <div className="h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={result.data}>
+                    <defs>
+                      <linearGradient id="valueGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="10%" stopColor="#3B82F6" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke={darkMode ? "#1e3a8a" : "#e5e7eb"}
+                    />
+
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fill: darkMode ? "#ccc" : "#555", fontSize: 12 }}
+                      tickFormatter={(str) => {
+                        const d = new Date(str);
+                        return `${d.getMonth() + 1}-${d.getFullYear()}`;
+                      }}
+                    />
+
+                    <YAxis
+                      tick={{ fill: darkMode ? "#ccc" : "#555", fontSize: 12 }}
+                      tickFormatter={(v) => `${(v / 100000).toFixed(1)}L`}
+                    />
+
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: darkMode ? "#1f2937" : "white",
+                        borderColor: darkMode ? "#1e3a8a" : "#ddd",
+                      }}
+                      formatter={(value) => [`₹ ${value.toLocaleString()}`, "Value"]}
+                    />
+
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#3B82F6"
+                      fill="url(#valueGradient)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
