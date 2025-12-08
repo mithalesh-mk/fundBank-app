@@ -42,6 +42,14 @@ export default function IntradayEChart({
       borderColor: "rgba(148, 163, 184, 0.25)",
       borderWidth: 1,
       padding: 10,
+      position: function (point : any, params : any, dom : any, rect : any, size : any) {
+        console.log(size)
+        console.log(size.viewSize[0]-point[0])
+        if(size.viewSize[0]-point[0]<202){
+          return ['70%', '5%']
+        }
+        return [point[0], '5%'];
+      },
       extraCssText: "border-radius: 10px; backdrop-filter: blur(6px);",
       textStyle: { color: "#e2e8f0", fontSize: fontSmall },
 
@@ -79,7 +87,7 @@ export default function IntradayEChart({
       type: "time",
       axisLabel: { show: false},
       axisTick: { show: false },
-      axisLine: { show: true },
+      axisLine: { show: false },
     },
 
     // FIXED
@@ -88,7 +96,7 @@ export default function IntradayEChart({
       min: minVal - 2,
       max: maxVal + 2,
       axisLabel: { show: false },
-      splitLine: { lineStyle: { color: "rgba(100,116,139,0.2)" } },
+      splitLine: { lineStyle: { color: "rgba(253, 253, 253, 0.2)" } },
     },
 
     series: [
