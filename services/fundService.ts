@@ -10,6 +10,11 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface SchemeName {
+  scheme_code: string;
+  scheme_name: string;
+}
+
 
 export interface MutualFundScheme {
   id: string;
@@ -52,19 +57,26 @@ class FundService {
   const res = await axiosInstance.get<ApiResponse<MutualFundScheme[]>>(
     "/funds/allfunds",
     {
-      params: {
-        page,
-        limit,
-        category,
-        fundhouse,
-        sortBy, 
-        order
-      },
-    }
-  );
+        params: {
+          page,
+          limit,
+          category,
+          fundhouse,
+          sortBy, 
+          order
+        },
+      }
+    );
 
-  return res.data.data;
-}
+    return res.data.data;
+  }
+
+  async getSchemeNames(amcName: string): Promise<SchemeName[]> {
+    const res = await axiosInstance.get<SchemeName[]>(`/funds/amc/${amcName}`);
+    return res.data;
+  }
+
+  
 
 }
 

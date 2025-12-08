@@ -63,7 +63,7 @@ const Calculators: FC = () => {
   
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-black dark:text-white font-inter">
+    <div className="min-h-screen dark:bg-gray-900 text-black dark:text-white font-inter">
       <div className="flex flex-col md:flex-row max-w-7xl mx-auto py-4 md:py-8 px-4 md:px-0 gap-6">
 
         {/* ------------------ HEADER (MOBILE & DESKTOP) ------------------ */}
