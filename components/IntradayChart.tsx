@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useMemo, useState } from "react";
-import ReactECharts from "echarts-for-react";
+import React, { useMemo, useState } from 'react';
+import ReactECharts from 'echarts-for-react';
 
 export default function IntradayEChart({
   data,
@@ -9,7 +9,7 @@ export default function IntradayEChart({
   data: { date: string; nav: number }[];
 }) {
   function fixDate(d: string) {
-    const [day, month, year] = d.split("-");
+    const [day, month, year] = d.split('-');
     return `${year}-${month}-${day}`;
   }
   const seriesData = data.map((d) => [
@@ -22,7 +22,7 @@ export default function IntradayEChart({
   const maxVal = Math.max(...values);
 
   const { fontSmall, fontMedium, fontLarge, lineWidth } = useMemo(() => {
-    const width = typeof window !== "undefined" ? window.innerWidth : 1200;
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1200;
 
     if (width < 500) {
       return { fontSmall: 8, fontMedium: 10, fontLarge: 12, lineWidth: 1 };
@@ -34,33 +34,50 @@ export default function IntradayEChart({
   }, []);
 
   const option = {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
 
     tooltip: {
-      trigger: "axis",
-      backgroundColor: "rgba(15, 23, 42, 0.95)",
-      borderColor: "rgba(148, 163, 184, 0.25)",
+      trigger: 'axis',
+      backgroundColor: 'rgba(15, 23, 42, 0.95)',
+      borderColor: 'rgba(148, 163, 184, 0.25)',
       borderWidth: 1,
       padding: 10,
-      position: function (point : any, params : any, dom : any, rect : any, size : any) {
-        console.log(size)
-        console.log(size.viewSize[0]-point[0])
-        if(size.viewSize[0]-point[0]<202){
-          return ['70%', '5%']
+      position: function (
+        point: any,
+        params: any,
+        dom: any,
+        rect: any,
+        size: any
+      ) {
+        const chartWidth = size.viewSize[0];
+        const tooltipWidth = dom.offsetWidth;
+
+        let x = point[0];
+        const y = '5%';
+
+        // If tooltip overflows right edge → shift left
+        if (x + tooltipWidth > chartWidth) {
+          x = chartWidth - tooltipWidth - 10; // padding from right
         }
-        return [point[0], '5%'];
+
+        // If tooltip overflows left edge → clamp to 10px
+        if (x < 10) {
+          x = 10;
+        }
+
+        return [x, y];
       },
-      extraCssText: "border-radius: 10px; backdrop-filter: blur(6px);",
-      textStyle: { color: "#e2e8f0", fontSize: fontSmall },
+      extraCssText: 'border-radius: 10px; backdrop-filter: blur(6px);',
+      textStyle: { color: '#e2e8f0', fontSize: fontSmall },
 
       formatter: (params: any) => {
         const p = params[0];
         const date = new Date(p.value[0]);
 
-        const formattedDate = date.toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
+        const formattedDate = date.toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
         });
 
         return `
@@ -80,55 +97,55 @@ export default function IntradayEChart({
       },
     },
 
-    grid: { left: "4%", right: "4%", bottom: "6%", top: "10%" },
+    grid: { left: '4%', right: '4%', bottom: '6%', top: '10%' },
 
     // FIXED
     xAxis: {
-      type: "time",
-      axisLabel: { show: false},
+      type: 'time',
+      axisLabel: { show: false },
       axisTick: { show: false },
       axisLine: { show: false },
     },
 
     // FIXED
     yAxis: {
-      type: "value",
+      type: 'value',
       min: minVal - 2,
       max: maxVal + 2,
       axisLabel: { show: false },
-      splitLine: { lineStyle: { color: "rgba(253, 253, 253, 0.2)" } },
+      splitLine: { lineStyle: { color: 'rgba(253, 253, 253, 0)' } },
     },
 
     series: [
       {
-        type: "line",
+        type: 'line',
         data: seriesData,
         smooth: 0.9,
-        symbol: "none",
+        symbol: 'none',
         lineStyle: {
           lineWidth: 1.2,
           color: {
-            type: "linear",
+            type: 'linear',
             x: 0,
             y: 0,
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: "#22c55e" },
-              { offset: 1, color: "#16a34a" }
-            ]
-          }
+              { offset: 0, color: '#22c55e' },
+              { offset: 1, color: '#16a34a' },
+            ],
+          },
         },
         areaStyle: {
           color: {
-            type: "linear",
+            type: 'linear',
             x: 0,
             y: 0,
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: " rgba(34,197,94,0.22)" },
-              { offset: 1, color: "rgba(34,197,94,0)" },
+              { offset: 0, color: ' rgba(34,197,94,0.22)' },
+              { offset: 1, color: ' rgba(34,197,94,0)' },
             ],
           },
           opacity: 0.8,
@@ -138,6 +155,6 @@ export default function IntradayEChart({
   };
 
   return (
-    <ReactECharts option={option} style={{ height: "100%", width: "100%" }} />
+    <ReactECharts option={option} style={{ height: '100%', width: '100%' }} />
   );
 }
