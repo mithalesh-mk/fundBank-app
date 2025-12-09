@@ -104,7 +104,7 @@ export default function IntradayEChart({
       type: 'time',
       axisLabel: { show: false },
       axisTick: { show: false },
-      axisLine: { show: false },
+      axisLine: { show: true, lineStyle: { color: 'rgba(203, 213, 225, 0.4)' }, },
     },
 
     // FIXED
@@ -136,20 +136,7 @@ export default function IntradayEChart({
             ],
           },
         },
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: ' rgba(34,197,94,0.22)' },
-              { offset: 1, color: ' rgba(34,197,94,0)' },
-            ],
-          },
-          opacity: 0.8,
-        },
+        
       },
     ],
   };
