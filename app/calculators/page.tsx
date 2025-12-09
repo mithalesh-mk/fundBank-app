@@ -10,6 +10,7 @@ import EmiVsSipCalculator from "@/components/calculators/EmiVsSipCalculator";
 import ChildEducationCalculator from "@/components/calculators/ChildEducationCalculator";
 import ChildMarraigeCalculator from "@/components/calculators/ChildMarraigeCalculator";
 import SIPCalculator from "@/components/calculators/SIPCalculator";
+import CapitalGainCalculator from "@/components/calculators/CapitalGainCalculator";
 
 const tabs: string[] = [
   "Mutual Funds SIP",
@@ -42,6 +43,8 @@ const CalculatorContent: FC<{ selectedTab: string }> = ({ selectedTab }) => {
       return <ChildEducationCalculator />;
     case "Child Marriage Calculator":
       return <ChildMarraigeCalculator />;
+    case "⁠Capital Gain Calculator":
+      return <CapitalGainCalculator />;
     default:
       return <SIPCalculator />;
   }

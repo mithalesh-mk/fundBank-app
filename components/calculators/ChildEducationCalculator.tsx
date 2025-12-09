@@ -100,7 +100,7 @@ export default function ChildEducationCalculator() {
               max="50"
               value={period}
               onChange={(e) => setPeriod(Number(e.target.value))}
-              className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+              className="w-full custom-slider h-2 rounded-lg appearance-none cursor-pointer"
               style={{
                 background: `linear-gradient(to right, #2B7FFF ${sliderFill(period, 1, 50)}%, #CBD5E1 ${sliderFill(period, 1, 50)}%)`,
               }}
@@ -126,7 +126,7 @@ export default function ChildEducationCalculator() {
               max="25"
               value={inflation}
               onChange={(e) => setInflation(Number(e.target.value))}
-              className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+              className="w-full custom-slider h-2 rounded-lg appearance-none cursor-pointer"
               style={{
                 background: `linear-gradient(to right, #2B7FFF ${sliderFill(inflation, 1, 25)}%, #CBD5E1 ${sliderFill(inflation, 1, 25)}%)`,
               }}
@@ -155,7 +155,7 @@ export default function ChildEducationCalculator() {
               max="15"
               value={returns}
               onChange={(e) => setReturns(Number(e.target.value))}
-              className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+              className="w-full custom-slider h-2 rounded-lg appearance-none cursor-pointer"
               style={{
                 background: `linear-gradient(to right, #2B7FFF ${sliderFill(returns, 0, 15)}%, #CBD5E1 ${sliderFill(returns, 0, 15)}%)`,
               }}

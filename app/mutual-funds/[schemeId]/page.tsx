@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import fundService from '@/services/fundService';
 import IntradayChart from '@/components/IntradayChart';
-import ReturnCalculator from '@/components/ReturnCalculator';
+import ReturnCalculator from '@/components/calculators/ReturnCalculator';
 
 const ranges = [
   { label: '1M', days: 30 },

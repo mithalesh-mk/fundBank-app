@@ -33,6 +33,7 @@
     outline: none;
   }
   input [type="radio"] {
+    background: #efefef;
   }
 }
 
@@ -90,9 +91,9 @@
   .form-input {
     @apply w-full px-4 py-2 rounded-xl bg-white/70 dark:bg-gray-800/40 
            border border-gray-300 dark:border-gray-700 
-           text-gray-900 dark:text-gray-100 shadow-sm focus:ring-2 
-           focus:ring-gray-400 focus:border-gray-400 outline-none;
+           text-gray-900 dark:text-gray-100 focus:ring-1 outline-none;
   }
+
 
   .th {
     @apply px-4 py-3 text-left font-semibold text-sm border-b border-gray-300 dark:border-gray-700;
@@ -101,11 +102,47 @@
   .td {
     @apply px-4 py-3 whitespace-nowrap;
   }
-}
-@layer components {
+  .select-menu {
+    @apply w-full px-4 py-2 rounded-xl bg-white/70 dark:bg-gray-800/40 
+           border border-gray-300 dark:border-gray-700 
+           text-gray-900 dark:text-gray-100 outline-none;
+  }
   .td-premium {
     @apply px-4 py-3 border-b dark:border-gray-800 whitespace-nowrap;
   }
+
+  .slider {
+    @apply w-full h-2 rounded-lg bg-gray-200 dark:bg-amber-700 appearance-none cursor-pointer;
+  }
+  
+  /* Slider Thumb */
+  .slider::-webkit-slider-thumb {
+    @apply appearance-none w-5 h-5 bg-blue-600 dark:bg-blue-400 rounded-full 
+           shadow-md border-2 border-white dark:border-gray-900 transition-all;
+  }
+  
+  .slider::-moz-range-thumb {
+    @apply w-5 h-5 bg-blue-600 dark:bg-blue-400 rounded-full 
+           shadow-md border-2 border-white dark:border-gray-900 transition-all;
+  }
+  
+  /* Hover effect */
+  .slider:hover::-webkit-slider-thumb {
+    @apply scale-110;
+  }
+  .slider:hover::-moz-range-thumb {
+    @apply scale-110;
+  }
+  
+  /* Active (dragging) effect */
+  .slider:active::-webkit-slider-thumb {
+    @apply scale-125;
+  }
+  .slider:active::-moz-range-thumb {
+    @apply scale-125;
+  }
+  
+
 }
 
 
@@ -119,9 +156,10 @@
 }
 
 /* Dark theme track */
-.dark .custom-slider {
+html.dark .custom-slider {
   background: #4b5563; /* gray-600 */
 }
+
 
 /* Thumb */
 .custom-slider::-webkit-slider-thumb {
