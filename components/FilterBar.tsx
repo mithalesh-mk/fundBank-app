@@ -519,7 +519,9 @@ export default function FiltersBar({
       <button
         className="ml-auto text-sm text-gray-500 dark:text-gray-400 hover:underline"
         onClick={() => {
-          setFilters({ category: [], fundhouse: [], tag: '' });
+          setFilters({ category: [], fundhouse: [], tag: '',sort: { sortBy: 'cagr_1y', order: 'desc' }, });
+          applyFilters();
+          setOpenDropdown(null);
         }}
       >
         Clear All
