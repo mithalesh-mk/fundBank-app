@@ -178,7 +178,6 @@ export default function Graph() {
                   </span>
                 ) : (
                   <span className="text-red-600">
-                    {'-'}
                     <NumberFlow
                       plugins={[continuous]}
                       value={returnsByRange[selectedRange] ?? 0}
