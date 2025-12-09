@@ -136,8 +136,6 @@ export default function RetirementCalculator() {
   return (
     <div className="max-w-full w-full mx-auto bg-white dark:bg-gray-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 transition">
 
-      <h1 className="text-3xl font-bold text-center">Retirement Calculator</h1>
-
       {/* ---- 2x2 GRID INPUTS ---- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Age */}
@@ -256,7 +254,7 @@ export default function RetirementCalculator() {
                   roiBefore,
                   0,
                   30
-                )}%, #4b5563 ${sliderFill(roiBefore, 0, 30)}%)`,
+                )}%, #CBD5E1 ${sliderFill(roiBefore, 0, 30)}%)`,
               }}
             />
           </div>
@@ -279,7 +277,7 @@ export default function RetirementCalculator() {
                   roiAfter,
                   0,
                   30
-                )}%, #4b5563 ${sliderFill(roiAfter, 0, 30)}%)`,
+                )}%, #CBD5E1 ${sliderFill(roiAfter, 0, 30)}%)`,
               }}
             />
           </div>
@@ -302,7 +300,7 @@ export default function RetirementCalculator() {
                   inflation,
                   3,
                   20
-                )}%, #4b5563 ${sliderFill(inflation, 3, 20)}%)`,
+                )}%, #CBD5E1 ${sliderFill(inflation, 3, 20)}%)`,
               }}
             />
           </div>

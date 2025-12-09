@@ -65,24 +65,36 @@ const estReturn = totalValue - investedAmount;
               Monthly investment
             </p>
             <div className="flex items-center justify-between gap-4">
-            <input
-              type="range"
-              min="100"
-              max="1000000"
-              step="500"
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
-              className="w-full custom-slider"
-              style={{
-                background: `linear-gradient(to right, #2b7fff ${sliderFill(
-                  amount,
-                  100,
-                  1000000
-                )}%, #4b5563 ${sliderFill(amount, 100, 1000000)}%)`,
-              }}
-            />
-
-              <span className={badgeClass}>₹{amount.toLocaleString()}</span>
+              <input
+                type="range"
+                min="100"
+                max="1000000"
+                step="500"
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+                className="w-full custom-slider"
+                style={{
+                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
+                    amount,
+                    100,
+                    1000000
+                  )}%, #CBD5E1 ${sliderFill(amount, 100, 1000000)}%)`,
+                }}
+              />
+            <div className="relative">
+                <input
+                  value={amount}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (val >= 0 && val <= 1000000) setAmount(val);
+                  }}
+                  className="w-20 border rounded-lg pl-2 py-1
+                             bg-gray-50 dark:bg-gray-800 
+                             border-gray-300 dark:border-gray-700 
+                             text-gray-800 dark:text-gray-200 text-center"
+                />
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">₹</span>
+            </div>
             </div>
           </div>
 
@@ -99,16 +111,29 @@ const estReturn = totalValue - investedAmount;
                 step={0.1}
                 value={rate}
                 onChange={(e) => setRate(Number(e.target.value))}
-                className="custom-slider w-full"
+                className="w-full h-2 custom-slider"
                 style={{
-                  background: `linear-gradient(to right, #2b7fff ${sliderFill(
+                  background: `linear-gradient(to right, #2B7FFF ${sliderFill(
                     rate,
                     1,
                     30
-                  )}%, #4b5563 ${sliderFill(rate, 1, 30)}%)`,
+                  )}%, #CBD5E1 ${sliderFill(rate, 1, 30)}%)`,
                 }}
               />
-              <span className={badgeClass}>{rate}%</span>
+              <div className="relative">
+                <input
+                  value={rate}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (val >= 0 && val <= 30) setRate(val);
+                  }}
+                  className="w-20 border rounded-lg pr-6 py-1
+                             bg-gray-50 dark:bg-gray-800 
+                             border-gray-300 dark:border-gray-700 
+                             text-gray-800 dark:text-gray-200 text-center"
+                />
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">%</span>
+              </div>
             </div>
           </div>
 
@@ -130,11 +155,24 @@ const estReturn = totalValue - investedAmount;
                     years,
                     1,
                     30
-                  )}%, #4b5563 ${sliderFill(years, 1, 30)}%)`,
+                  )}%, #CBD5E1 ${sliderFill(years, 1, 30)}%)`,
                 }
               }
               />
-              <span className={badgeClass}>{years} Yr</span>
+              <div className="relative">
+                <input
+                  value={years}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (val >= 0 && val <= 30) setYears(val);
+                  }}
+                  className="w-20 border rounded-lg pr-5 py-1
+                             bg-gray-50 dark:bg-gray-800 
+                             border-gray-300 dark:border-gray-700 
+                             text-gray-800 dark:text-gray-200 text-center"
+                />
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">yr</span>
+            </div>
             </div>
           </div>
 

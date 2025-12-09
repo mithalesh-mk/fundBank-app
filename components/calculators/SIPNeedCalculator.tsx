@@ -78,7 +78,7 @@ export default function SIPNeedCalculator() {
                 max="50"
                 value={period}
                 onChange={(e) => setPeriod(Number(e.target.value))}
-                className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                className="w-full h-2 custom-slider"
                 style={{
                   background: `linear-gradient(to right, #2B7FFF ${sliderFill(
                     period, 1, 50
@@ -110,7 +110,7 @@ export default function SIPNeedCalculator() {
                 max="25"
                 value={returns}
                 onChange={(e) => setReturns(Number(e.target.value))}
-                className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                className="w-full h-2 custom-slider"
                 style={{
                   background: `linear-gradient(to right, #2B7FFF ${sliderFill(
                     returns, 1, 25
@@ -146,7 +146,7 @@ export default function SIPNeedCalculator() {
                 max="15"
                 value={inflation}
                 onChange={(e) => setInflation(Number(e.target.value))}
-                className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                className="w-full h-2 custom-slider"
                 style={{
                   background: `linear-gradient(to right, #2B7FFF ${sliderFill(
                     inflation, 0, 15

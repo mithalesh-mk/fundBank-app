@@ -69,20 +69,24 @@ export default function LumpsumCalculator() {
                   amount,
                   1000,
                   200000
-                )}%, #4b5563 ${sliderFill(amount, 1000, 200000)}%)`,
+                )}%, #CBD5E1 ${sliderFill(amount, 1000, 200000)}%)`,
               }}
             />
 
-            ₹<input
-                min="1"
-                max="25"
-                value={amount}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  if (val >= 0 && val <= 200000) setAmount(val);
-                }}
-                className={`${badgeClass} w-16 text-center !px-0`}
-              />
+            <div className="relative">
+                <input
+                  value={amount}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (val >= 0 && val <= 200000) setAmount(val);
+                  }}
+                  className="w-20 border rounded-lg pl-2 py-1
+                             bg-gray-50 dark:bg-gray-800 
+                             border-gray-300 dark:border-gray-700 
+                             text-gray-800 dark:text-gray-200 text-center"
+                />
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">₹</span>
+            </div>
             </div>
           </div>
 
@@ -104,19 +108,23 @@ export default function LumpsumCalculator() {
                     rate,
                     1,
                     25
-                  )}%, #4b5563 ${sliderFill(rate, 1, 25)}%)`,
+                  )}%, #CBD5E1 ${sliderFill(rate, 1, 25)}%)`,
                 }}
               />
-              %<input
-                min="1"
-                max="25"
-                value={rate}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  if (val >= 0 && val <= 25) setRate(val);
-                }}
-                className={`${badgeClass} w-16 text-center`}
-              />
+              <div className="relative">
+                <input
+                  value={rate}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (val >= 0 && val <= 30) setRate(val);
+                  }}
+                  className="w-20 border rounded-lg pr-6 py-1
+                             bg-gray-50 dark:bg-gray-800 
+                             border-gray-300 dark:border-gray-700 
+                             text-gray-800 dark:text-gray-200 text-center"
+                />
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">%</span>
+              </div>
             </div>
           </div>
 
@@ -138,20 +146,24 @@ export default function LumpsumCalculator() {
                     years,
                     1,
                     30
-                  )}%, #4b5563 ${sliderFill(years, 1, 30)}%)`,
+                  )}%, #CBD5E1 ${sliderFill(years, 1, 30)}%)`,
                 }
               }
               />
-              yr<input
-                min="1"
-                max="30"
-                value={years}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  if (val >= 0 && val <= 30) setYears(val);
-                }}
-                className={`${badgeClass} w-16 text-center !px-0`}
-              />
+              <div className="relative">
+                <input
+                  value={years}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (val >= 0 && val <= 30) setYears(val);
+                  }}
+                  className="w-20 border rounded-lg pr-6 py-1
+                             bg-gray-50 dark:bg-gray-800 
+                             border-gray-300 dark:border-gray-700 
+                             text-gray-800 dark:text-gray-200 text-center"
+                />
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">yr</span>
+              </div>
             </div>
           </div>
 
