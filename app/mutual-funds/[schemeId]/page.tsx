@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import fundService from '@/services/fundService';
 import IntradayChart from '@/components/IntradayChart';
-import ReturnCalculator from '@/components/calculators/ReturnCalculator';
+import ReturnCalculator from '@/components/ReturnCalculator';
+import NumberFlow, { continuous } from '@number-flow/react';
 
 const ranges = [
   { label: '1M', days: 30 },
@@ -38,17 +39,18 @@ export default function Graph() {
   const [schemeName, setSchemeName] = useState('');
   const [fundMeta, setFundMeta] = useState<FundMeta | null>(null);
   const [expectedCagr, setExpectedCagr] = useState<number | null>(null);
-  const [returnsByRange, setReturnsByRange] = useState<Record<string, number | null>>({});
+  const [returnsByRange, setReturnsByRange] = useState<
+    Record<string, number | null>
+  >({});
 
   const calculateReturn = (data: any[]) => {
-  if (!data || data.length < 2) return null;
+    if (!data || data.length < 2) return null;
 
-  const navEnd = data[0]?.nav;
-  const navStart = data[data.length - 1]?.nav;
-  if (!navStart || !navEnd) return null;
-  return ((navEnd - navStart) / navStart) * 100; 
+    const navEnd = data[0]?.nav;
+    const navStart = data[data.length - 1]?.nav;
+    if (!navStart || !navEnd) return null;
+    return ((navEnd - navStart) / navStart) * 100;
   };
-
 
   const calculateExpectedCagr = () => {
     try {
@@ -115,13 +117,13 @@ export default function Graph() {
           tempData[res.value.label] = res.value.data;
         }
       });
-      console.log(tempData)
+      console.log(tempData);
       setAllData(tempData);
       const tempReturns: Record<string, number | null> = {};
       Object.keys(tempData).forEach((label) => {
         tempReturns[label] = calculateReturn(tempData[label]);
       });
-      setReturnsByRange(tempReturns); 
+      setReturnsByRange(tempReturns);
     } catch (err) {
       console.error('Error fetching ranges:', err);
     } finally {
@@ -144,8 +146,6 @@ export default function Graph() {
 
   const data = allData[selectedRange];
   const latestNav = data ? data[data.length - 1]?.nav : null;
-  console.log('Expected CAGR:', expectedCagr);
-  console.log('Latest NAV:', latestNav);
 
   return (
     <div className="min-h-screen dark:bg-gray-900 text-black dark:text-white pt-12 px-4 sm:px-6">
@@ -159,25 +159,40 @@ export default function Graph() {
               alt="Fund Logo"
               className="w-12 h-12 rounded-md"
             />
-            <h1 className="text-2xl sm:text-3xl font-bold">
+            <h1 className="text-md md:text-2xl font-bold">
               {schemeName || 'Mutual Fund Scheme'}
             </h1>
           </div>
-          <div className="mb-3 text-lg font-semibold">
-            {returnsByRange[selectedRange] !== null ? (
-              <span>
-                {returnsByRange[selectedRange]>0?<span className="text-green-600">
-                  +{returnsByRange[selectedRange]?.toFixed(2)}%
-                </span>:<span className="text-red-600">
-                  -{returnsByRange[selectedRange]?.toFixed(2)}%
-                </span>}
+          <div className="mb-3">
+            {!loading && returnsByRange[selectedRange] !== null &&
+              <span className="md:text-lg text-md font-semibold">
+                {' '}
+                {returnsByRange[selectedRange] > 0 ? (
+                  <span className="text-green-600 md:text-[24px] text-[20px]">
+                    {'+'}
+                    <NumberFlow
+                      plugins={[continuous]}
+                      value={returnsByRange[selectedRange] ?? 0}
+                      spinTiming={{duration: 500}}
+                    />%
+                  </span>
+                ) : (
+                  <span className="text-red-600">
+                    <NumberFlow
+                      plugins={[continuous]}
+                      value={returnsByRange[selectedRange] ?? 0}
+                      spinTiming={{duration: 500}}
+                    />%
+                  </span>
+                )}{' '}
               </span>
-            ) : (
-              <span className="text-gray-500">Return not available</span>
-            )}
+            }
+            {!loading && <span className="text-[10px] text-gray-500 dark:text-gray-500 ml-1">
+              {selectedRange} return
+            </span>}
           </div>
 
-          <div className="relative w-full h-[350px] sm:h-[420px] lg:h-[450px] bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+          <div className="relative w-full h-[350px] sm:h-[420px] lg:h-[450px] bg-white dark:bg-gray-900 rounded-xl overflow-hidden">
             {loading ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-lg">Loading...</p>
@@ -191,40 +206,35 @@ export default function Graph() {
             )}
 
             {/* RANGE BUTTONS */}
-            
           </div>
           <div className="w-fit mx-auto flex flex-wrap gap-2 px-2">
-              {!loading &&
-                ranges.map((r) => {
-                  if (r.label === '3M' && allData['3M'].length < 30)
-                    return null;
-                  if (r.label === '6M' && allData['6M'].length < 90)
-                    return null;
-                  if (r.label === '1Y' && allData['1Y'].length < 180)
-                    return null;
-                  if (r.label === '3Y' && allData['3Y'].length < 365)
-                    return null;
-                  if (r.label === '5Y' && allData['5Y'].length < 1095)
-                    return null;
-                  if (r.label === 'All' && allData['All'].length < 365 * 5)
-                    return null;
+            {!loading &&
+              ranges.map((r) => {
+                if (r.label === '3M' && allData['3M'].length < 30) return null;
+                if (r.label === '6M' && allData['6M'].length < 90) return null;
+                if (r.label === '1Y' && allData['1Y'].length < 180) return null;
+                if (r.label === '3Y' && allData['3Y'].length < 365) return null;
+                if (r.label === '5Y' && allData['5Y'].length < 1095)
+                  return null;
+                if (r.label === 'All' && allData['All'].length < 365 * 5)
+                  return null;
 
-                  return (
-                    <button
-                      key={r.label}
-                      onClick={() => setSelectedRange(r.label)}
-                      className={`px-3 py-1 text-sm font-medium rounded-2xl border transition
+                return (
+                  <button
+                    key={r.label}
+                    onClick={() => setSelectedRange(r.label)}
+                    className={`px-3 py-1 text-sm font-medium rounded-2xl border transition
                     ${
                       selectedRange === r.label
                         ? 'bg-green-600 text-white border-green-700'
                         : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700'
                     }`}
-                    >
-                      {r.label}
-                    </button>
-                  );
-                })}
-            </div>
+                  >
+                    {r.label}
+                  </button>
+                );
+              })}
+          </div>
         </div>
 
         {/* RIGHT SECTION (CALCULATOR) */}
