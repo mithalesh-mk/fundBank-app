@@ -15,6 +15,44 @@ export interface SchemeName {
   scheme_name: string;
 }
 
+// swp.types.ts
+
+export interface IntervalNav {
+  date: string;
+  nav: string;
+}
+
+
+export interface SwpReportItem {
+  units: number;
+  cumulative_units: number;
+  cash_flow: number;
+  net_amount: number;
+  capital_gains_loss: number;
+  current_nav: number;
+  current_value: number;
+  current_date: string;
+}
+
+export interface SwpResponse {
+  file_path: string;
+  interval_nav: IntervalNav[];
+  success: boolean;
+  swp_report: SwpReportItem[];
+}
+
+export interface SwpPostData {
+  scheme_code: string;
+  swp_date: number;
+  invest_date: string;
+  start_date: string;
+  end_date: string;
+  total_invested_amount: number;
+  withdrawal_amount: number;
+  interval: string;
+}
+
+
 
 export interface MutualFundScheme {
   id: string;
@@ -76,7 +114,14 @@ class FundService {
     return res.data;
   }
 
-  
+  async calculateSwp(postData: SwpPostData): Promise<SwpResponse> {
+    const { data } = await axiosInstance.post<SwpResponse>(
+      "funds/swp",
+      postData
+    );
+
+    return data;
+  }
 
 }
 
