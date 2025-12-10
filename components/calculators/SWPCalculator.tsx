@@ -14,6 +14,8 @@ import {
 import { Moon, Sun, Download, Calendar as CalendarIcon } from "lucide-react";
 import fundService, { SchemeName } from "@/services/fundService";
 
+
+
 // ---------------------------------------------------
 // AMC LIST
 // ---------------------------------------------------
@@ -72,20 +74,18 @@ const amcList = [
 export default function SWPCalculator() {
   const [darkMode, setDarkMode] = useState(false);
   const [result, setResult] = useState<any>(null);
-
+  const [amc, setAmc] = useState<string>("Mirae Asset Mutual Fund");
   const [schemeNames, setSchemeNames] = useState<SchemeName[]>([]);
 
   const [formData, setFormData] = useState({
-    amc: "Mirae Asset Mutual Fund",
-    scheme: "Mirae Asset Large Cap Gr",
-    lumpsum: 1000000,
-    investDate: "2016-08-20",
-    withdrawal: 3000,
-    swpDate: "10",
-    periodType: "Monthly",
-    swpStartDate: "2016-08-20",
-    swpEndDate: "2025-12-07",
-    years: "",
+    scheme_code: "119551",
+    swp_date: 10,
+    invest_date: "2016-08-20",
+    start_date: "2016-08-20",
+    total_invested_amount: 1000000,
+    end_date: "2025-12-07",
+    withdrawal_amount: 3000,
+    interval: "monthly",
   });
 
   const fetchSchemeNames = async (amc: string) => {
@@ -98,14 +98,50 @@ export default function SWPCalculator() {
   };
 
   useEffect(() => {
-    fetchSchemeNames(formData.amc);
-  }, [formData.amc]);
+    fetchSchemeNames(amc);
+  }, [amc]);
 
+  // Convert number fields automatically
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    const numberFields = [
+      "total_invested_amount",
+      "withdrawal_amount",
+      "swp_date",
+    ];
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: numberFields.includes(name) ? Number(value) : value,
+    }));
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    try {
+      const swpResult = await fundService.calculateSwp(formData);
+  
+      const chartData = swpResult.swp_report.map((r: any) => ({
+        date: r.current_date,
+        value: Number(r.current_value),
+      }));
+  
+      setResult({
+        ...swpResult,
+        data: chartData, // <<< required for chart
+      });
+  
+      console.log("SWP Result:", swpResult);
+    } catch (error) {
+      console.error("Error calculating SWP:", error);
+    }
+  };
+
+  
+
+  // FIXED: invest_date name was wrong earlier
   const DateInput = ({ label, name, value }: any) => (
     <div className="space-y-2">
       <label className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
@@ -146,8 +182,8 @@ export default function SWPCalculator() {
               </label>
               <select
                 name="amc"
-                value={formData.amc}
-                onChange={handleInputChange}
+                value={amc}
+                onChange={(e) => setAmc(e.target.value)}
                 className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
                            bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
               >
@@ -165,15 +201,15 @@ export default function SWPCalculator() {
                 Select Scheme
               </label>
               <select
-                name="scheme"
-                value={formData.scheme}
+                value={formData.scheme_code}
                 onChange={handleInputChange}
+                name="scheme_code"
                 className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
                            bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 {schemeNames?.map((s, index) => (
-                  <option key={index} value={s.scheme_name}>
-                    {s.scheme_name}
+                  <option key={index} value={s.scheme_code}>
+                    {s.scheme_name} {s.scheme_code}
                   </option>
                 ))}
               </select>
@@ -185,15 +221,16 @@ export default function SWPCalculator() {
                 Lumpsum Amount
               </label>
               <input
-                name="lumpsum"
-                value={formData.lumpsum}
+                name="total_invested_amount"
+                value={formData.total_invested_amount}
                 onChange={handleInputChange}
                 className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
                            bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
-            <DateInput label="Investment Date" name="investDate" value={formData.investDate} />
+            {/* FIXED NAME */}
+            <DateInput label="Investment Date" name="invest_date" value={formData.invest_date} />
 
             {/* Withdrawal */}
             <div className="space-y-2">
@@ -201,8 +238,8 @@ export default function SWPCalculator() {
                 Withdrawal Amount
               </label>
               <input
-                name="withdrawal"
-                value={formData.withdrawal}
+                name="withdrawal_amount"
+                value={formData.withdrawal_amount}
                 onChange={handleInputChange}
                 className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
                            bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
@@ -215,8 +252,8 @@ export default function SWPCalculator() {
                 SWP Date
               </label>
               <select
-                name="swpDate"
-                value={formData.swpDate}
+                name="swp_date"
+                value={formData.swp_date}
                 onChange={handleInputChange}
                 className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
                            bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
@@ -235,24 +272,27 @@ export default function SWPCalculator() {
                 Select Period
               </label>
               <select
-                name="periodType"
-                value={formData.periodType}
+                name="interval"
+                value={formData.interval}
                 onChange={handleInputChange}
                 className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
                            bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
               >
-                <option>Monthly</option>
-                <option>Quarterly</option>
-                <option>Yearly</option>
+                <option value="weekly">Weekly</option>
+                <option value="fortnightly">Fortnightly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
               </select>
             </div>
 
-            <DateInput label="SWP Start Date" name="swpStartDate" value={formData.swpStartDate} />
-            <DateInput label="SWP End Date" name="swpEndDate" value={formData.swpEndDate} />
+            <DateInput label="SWP Start Date" name="start_date" value={formData.start_date} />
+            <DateInput label="SWP End Date" name="end_date" value={formData.end_date} />
           </div>
 
           <div className="pt-8">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-lg shadow transition-all active:scale-95">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-lg shadow transition-all active:scale-95"
+            onClick={handleSubmit}
+            >
               Submit
             </button>
           </div>
@@ -260,7 +300,7 @@ export default function SWPCalculator() {
 
         {/* ======================== RESULTS ======================== */}
         {result && (
-          <>
+          <div className="space-y-16">
             <div className="rounded-xl border border-gray-200 dark:border-blue-900 
                             bg-gray-50 dark:bg-gray-800 p-6 flex flex-col gap-6 transition-all">
 
@@ -280,7 +320,7 @@ export default function SWPCalculator() {
                 <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
                   <p className="text-gray-500 dark:text-gray-300 text-xs">Total Withdrawal</p>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                    ₹ {result.totalWithdrawn.toLocaleString("en-IN")}
+                    ₹ {result.totalWithdrawn}
                   </h3>
                 </div>
 
@@ -293,63 +333,148 @@ export default function SWPCalculator() {
               </div>
             </div>
 
-            {/* Chart Box */}
-            <div className="rounded-xl border border-gray-200 dark:border-blue-900 
-                            bg-gray-50 dark:bg-gray-800 p-6 transition-all">
-
-              <h3 className="text-lg font-medium text-blue-600 dark:text-blue-400 text-center mb-4">
-                Value Movement – {formData.scheme}
+            <div className="w-full h-72">
+            <h3
+                className={`text-lg font-semibold mb-4 ${
+                  darkMode ? "text-gray-100" : "text-gray-800"
+                }`}
+              >
+                SWP Growth Chart
               </h3>
 
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={result.data}>
-                    <defs>
-                      <linearGradient id="valueGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="10%" stopColor="#3B82F6" stopOpacity={0.8} />
-                        <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
+              <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={result.data}>
+                <defs>
+                    <linearGradient id="valueGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
 
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke={darkMode ? "#1e3a8a" : "#e5e7eb"}
-                    />
+                  <CartesianGrid
+                    strokeDasharray="4 4"
+                    vertical={false}
+                    stroke={darkMode ? "#1f2a48" : "#e5e7eb"}
+                  />
 
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fill: darkMode ? "#ccc" : "#555", fontSize: 12 }}
-                      tickFormatter={(str) => {
-                        const d = new Date(str);
-                        return `${d.getMonth() + 1}-${d.getFullYear()}`;
-                      }}
-                    />
+                  {/* X-Axis */}
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fill: darkMode ? "#c9d1d9" : "#374151", fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(value: string) => {
+                      const d = new Date(value);
 
-                    <YAxis
-                      tick={{ fill: darkMode ? "#ccc" : "#555", fontSize: 12 }}
-                      tickFormatter={(v) => `${(v / 100000).toFixed(1)}L`}
-                    />
+                      // Check for invalid date
+                      if (isNaN(d.getTime())) return "";
 
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: darkMode ? "#1f2937" : "white",
-                        borderColor: darkMode ? "#1e3a8a" : "#ddd",
-                      }}
-                      formatter={(value) => [`₹ ${value.toLocaleString()}`, "Value"]}
-                    />
+                      return d.toLocaleString("en-US", {
+                        month: "short", 
+                        year: "numeric",
+                      });
+                    }}
+                  />
 
-                    <Area
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#3B82F6"
-                      fill="url(#valueGradient)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+                  {/* Y-Axis */}
+                  <YAxis
+                    tick={{ fill: darkMode ? "#c9d1d9" : "#374151", fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v: number) => `${(v / 100000).toFixed(1)}L`}
+                  />
+
+                  {/* Tooltip */}
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: darkMode ? "#111827" : "#ffffff",
+                      borderColor: darkMode ? "#374151" : "#e5e7eb",
+                      borderRadius: 10,
+                      fontSize: 12,
+                    }}
+                    formatter={(value: number) => [`₹ ${value.toLocaleString()}`, "Value"]}
+                    
+                  />
+
+                  {/* Area Line */}
+                  <Area
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#22c55e"
+                    fill="url(#valueGradient)"
+                    strokeWidth={2}
+                    activeDot={{ r: 4 }}
+                  />
+                </AreaChart>
+
+              </ResponsiveContainer>
+
               </div>
-            </div>
-          </>
+
+            {/* ======================== SWP REPORT TABLE ======================== */}
+              <div className="rounded-xl mt-10 border border-gray-200 dark:border-blue-900 
+                              bg-gray-50 dark:bg-gray-800 p-6 transition-all">
+
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium text-blue-600 dark:text-blue-400">
+                    SWP Withdrawal Report
+                  </h3>
+
+                  {/* DOWNLOAD BUTTON */}
+                  <button
+                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow"
+                  >
+                    <Download size={16} />
+                    Download Excel
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-200 dark:bg-gray-700 text-left text-sm">
+                        <th className="p-2">Date</th>
+                        <th className="p-2">NAV</th>
+                        <th className="p-2">Units</th>
+                        <th className="p-2">Cumulative Units</th>
+                        <th className="p-2">Cash Flow</th>
+                        <th className="p-2">Current Value</th>
+                        <th className="p-2">Capital Gains / Loss</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {result?.swp_report?.map((row: any, idx: number) => (
+                        <tr
+                          key={idx}
+                          className="border-b dark:border-gray-700 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          <td className="p-2">{row.current_date}</td>
+                          <td className="p-2">{row.current_nav.toFixed(4)}</td>
+                          <td className="p-2">{row.units.toFixed(4)}</td>
+                          <td className="p-2">{row.cumulative_units.toFixed(4)}</td>
+                          <td className="p-2">₹ {row.cash_flow.toLocaleString()}</td>
+                          <td className="p-2">₹ {row.current_value.toLocaleString()}</td>
+                          <td
+                            className={`p-2 ${
+                              row.capital_gains_loss >= 0
+                                ? "text-green-600"
+                                : "text-red-500"
+                            }`}
+                          >
+                            ₹ {row.capital_gains_loss.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+
+            
+
+          </div>
         )}
       </div>
     </div>
