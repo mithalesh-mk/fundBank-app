@@ -138,7 +138,7 @@ export default function MutualFunds() {
   };
 
   return (
-    <div className="min-h-screen px-4 md:px-16 py-10">
+    <div className="min-h-screen px-4 md:px-16 py-10 container mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
         All Mutual Funds
       </h1>
