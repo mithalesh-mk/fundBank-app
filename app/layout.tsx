@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <ThemeProvider>
     <html lang="en">
-      <body className="bg-white dark:bg-gray-900 transition-colors container mx-auto">
+      <body className="bg-white dark:bg-gray-900 transition-colors">
         
           <Navbar />
           {children}

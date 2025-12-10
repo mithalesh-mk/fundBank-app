@@ -13,7 +13,7 @@ export const Navbar = () => {
     <>
       {/* NAVBAR */}
       <header className="w-full sticky top-0 z-50 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between ">
 
           {/* LOGO */}
           <Link href="/" className="text-2xl font-extrabold tracking-tight">

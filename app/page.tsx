@@ -1,11 +1,12 @@
 "use client";
 
+import Hero from "@/components/Hero";
 import { TrendingUp, LineChart, BarChart3, ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="px-4 mb-6 md:mb-6 md:py-4">
-
+    <div className="mb-6 md:mb-6 md:py-4">
+      <Hero/>
       {/* Hero Section */}
       <section className="mt-10 bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 md:p-14 shadow-lg border border-white/20 dark:border-gray-700 transition">
         
