@@ -13,7 +13,6 @@ import {
 
 import { Moon, Sun, Download, Calendar as CalendarIcon } from "lucide-react";
 import fundService, { SchemeName } from "@/services/fundService";
-import { event } from "@primeuix/themes/aura/timeline";
 
 
 // -----------------------
