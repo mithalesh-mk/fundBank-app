@@ -6,6 +6,7 @@ import fundService from '@/services/fundService';
 import IntradayChart from '@/components/IntradayChart';
 import ReturnCalculator from '@/components/calculators/ReturnCalculator';
 import NumberFlow, { continuous } from '@number-flow/react';
+import { all } from 'axios';
 
 const ranges = [
   { label: '1M', days: 30 },
@@ -164,7 +165,7 @@ export default function Graph() {
             </h1>
           </div>
           <div className="mb-3">
-            {!loading && returnsByRange[selectedRange] !== null &&
+            {!loading && returnsByRange[selectedRange] !== null && (
               <span className="md:text-lg text-md font-semibold">
                 {' '}
                 {returnsByRange[selectedRange] > 0 ? (
@@ -173,23 +174,49 @@ export default function Graph() {
                     <NumberFlow
                       plugins={[continuous]}
                       value={returnsByRange[selectedRange] ?? 0}
-                      spinTiming={{duration: 500}}
-                    />%
+                      spinTiming={{ duration: 500 }}
+                    />
+                    %
                   </span>
                 ) : (
                   <span className="text-red-600">
                     <NumberFlow
                       plugins={[continuous]}
                       value={returnsByRange[selectedRange] ?? 0}
-                      spinTiming={{duration: 500}}
-                    />%
+                      spinTiming={{ duration: 500 }}
+                    />
+                    %
                   </span>
                 )}{' '}
               </span>
-            }
-            {!loading && <span className="text-[10px] text-gray-500 dark:text-gray-500 ml-1">
-              {selectedRange} return
-            </span>}
+            )}
+            {!loading && (
+              <span className="text-[12px] font-semibold text-gray-400 dark:text-gray-500 ml-1">
+                {selectedRange} return
+              </span>
+            )}
+
+            {!loading &&
+              (() => {
+                const current = Number(allData['1M']?.[0]?.nav);
+                const previous = Number(allData['1M']?.[1]?.nav);
+
+                const change = previous
+                  ? ((current - previous) / previous) * 100
+                  : 0;
+
+                const isPositive = change >= 0;
+
+                return (
+                  <span
+                    className={`text-[12px] font-semibold ml-1 block ${
+                      isPositive ? 'text-green-600' : 'text-red-600'
+                    }`}
+                  >
+                    {isPositive? '+ ' + change.toFixed(2): '- ' + change.toFixed(2)}% <span className='text-gray-400'>1D</span>
+                  </span>
+                );
+              })()}
           </div>
 
           <div className="relative w-full h-[350px] sm:h-[420px] lg:h-[450px] bg-white dark:bg-gray-900 rounded-xl overflow-hidden">
