@@ -1,37 +1,31 @@
-interface CategoryCardProps {
-  title: string;
-  isOpen: boolean;
-  onClick: () => void;
-}
+"use client";
 
-export default function CategoryCard({
-  title,
-  isOpen,
-  onClick,
-}: CategoryCardProps) {
+import { ChevronDown } from "lucide-react";
+import { motion } from "framer-motion";
+
+export default function CategoryCard({ title, subtitle, isOpen, onClick, slim }: any) {
   return (
     <div
+      className={`rounded-xl cursor-pointer transition shadow-sm bg-white dark:bg-gray-800 
+      ${slim ? "p-4" : "p-5"} hover:shadow-md`}
       onClick={onClick}
-      className={` h-[10vh] flex items-center justify-between px-6
-        cursor-pointer rounded-lg shadow-md border
-        bg-gray-100 dark:bg-gray-800 
-        border-gray-300 dark:border-gray-700
-        transition-all duration-300
-        hover:shadow-lg hover:bg-gray-200 dark:hover:bg-gray-700`}
     >
-      {/* Title */}
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-        {title}
-      </h2>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              {subtitle}
+            </p>
+          )}
+        </div>
 
-      {/* Arrow */}
-      <span
-        className={`transform transition-transform duration-300 ${
-          isOpen ? "rotate-180" : "rotate-0"
-        } text-gray-700 dark:text-gray-300`}
-      >
-        ▼
-      </span>
+        <motion.div animate={{ rotate: isOpen ? 180 : 0 }}>
+          <ChevronDown size={18} className="text-gray-600 dark:text-gray-300" />
+        </motion.div>
+      </div>
     </div>
   );
 }
