@@ -13,6 +13,32 @@ import {
 
 import { Moon, Sun, Download, Calendar as CalendarIcon } from "lucide-react";
 import fundService, { SchemeName } from "@/services/fundService";
+import { event } from "@primeuix/themes/aura/timeline";
+
+
+// -----------------------
+// XIRR CALCULATOR
+// -----------------------
+function xirr(cashflows: number[], dates: Date[], guess = 0.1) {
+  const f = (rate: number) =>
+    cashflows.reduce((sum, cf, i) => {
+      const days = (dates[i].getTime() - dates[0].getTime()) / (1000 * 3600 * 24);
+      return sum + cf / Math.pow(1 + rate, days / 365);
+    }, 0);
+
+  let rate = guess;
+
+  for (let i = 0; i < 100; i++) {
+    const f1 = f(rate);
+    const f2 = (f(rate + 1e-6) - f(rate - 1e-6)) / (2e-6); // numerical derivative
+    const newRate = rate - f1 / f2;
+
+    if (Math.abs(newRate - rate) < 1e-7) break;
+    rate = newRate;
+  }
+
+  return rate;
+}
 
 
 
@@ -77,6 +103,12 @@ export default function SWPCalculator() {
   const [amc, setAmc] = useState<string>("Mirae Asset Mutual Fund");
   const [schemeNames, setSchemeNames] = useState<SchemeName[]>([]);
 
+  const [swpResult, setSwpResult] = useState({
+    installments: 0,
+    totalWithdrawn: 0,
+    returnPerc: 0,
+  })
+
   const [formData, setFormData] = useState({
     scheme_code: "119551",
     swp_date: 10,
@@ -101,6 +133,30 @@ export default function SWPCalculator() {
     fetchSchemeNames(amc);
   }, [amc]);
 
+  useEffect(() => {
+    const fetchSwpResult = async () => {
+      try {
+        const swpResult = await fundService.calculateSwp(formData);
+
+        const chartData = swpResult.swp_report.map((r: any) => ({
+          date: r.current_date,
+          value: Number(r.current_value),
+        }));
+
+        setResult({
+          ...swpResult,
+          data: chartData, // <<< required for chart
+        });
+
+        console.log("SWP Result:", swpResult);
+      } catch (error) {
+        console.error("Error calculating SWP:", error);
+      }
+    };
+
+    fetchSwpResult();
+  }, []);
+
   // Convert number fields automatically
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
@@ -119,24 +175,85 @@ export default function SWPCalculator() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    //calculate installment based on intervals
+    const totalTimeIntervals = (interval: string) => {
+      switch (interval) {
+        case "weekly":
+          return 7;
+        case "fortnightly":
+          return 14;
+        case "monthly":
+          return 30;
+        case "yearly":
+          return 365;
+        default:
+          return 0;
+      }    
+
+    };
+    const endDate =  new Date(formData.end_date)
+    const startDate = new Date(formData.start_date)
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const totalInstallments = diffDays/totalTimeIntervals(formData.interval);
+    setSwpResult({
+      ...swpResult,
+      totalWithdrawn : totalInstallments * formData.withdrawal_amount,
+      installments: totalInstallments
+    })
   
     try {
       const swpResult = await fundService.calculateSwp(formData);
-  
+    
       const chartData = swpResult.swp_report.map((r: any) => ({
         date: r.current_date,
         value: Number(r.current_value),
       }));
-  
+    
+      // --------------------------
+      // BUILD CASHFLOWS FOR XIRR
+      // --------------------------
+      const cashflows: number[] = [];
+      const dates: Date[] = [];
+    
+      // Initial investment = negative
+      cashflows.push(-formData.total_invested_amount);
+      dates.push(new Date(formData.invest_date));
+    
+      // All withdrawals = positive
+      swpResult.swp_report.forEach((r: any) => {
+        cashflows.push(r.cash_flow); // already negative or positive based on your logic
+        dates.push(new Date(r.current_date));
+      });
+    
+      // Final value = positive (if you want to include current value)
+      const last = swpResult.swp_report[swpResult.swp_report.length - 1];
+      if (last) {
+        cashflows.push(last.current_value);
+        dates.push(new Date(last.current_date));
+      }
+    
+      // Calculate XIRR
+      let irr = xirr(cashflows, dates);
+      irr = irr * 100; // convert to %
+      console.log("XIRR:", irr);  
+    
+      // Update return %
+      setSwpResult((prev) => ({
+        ...prev,
+        returnPerc: irr,
+      }));
+    
+      // Set result for UI
       setResult({
         ...swpResult,
-        data: chartData, // <<< required for chart
+        data: chartData,
       });
-  
-      console.log("SWP Result:", swpResult);
     } catch (error) {
       console.error("Error calculating SWP:", error);
     }
+    
   };
 
   
@@ -144,19 +261,17 @@ export default function SWPCalculator() {
   // FIXED: invest_date name was wrong earlier
   const DateInput = ({ label, name, value }: any) => (
     <div className="space-y-2">
-      <label className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+      <label className="text-xs font-semibold uppercase">
         {label}
       </label>
-
-      <div className="relative">
-        <CalendarIcon className="absolute left-3 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
+      <div className="">
         <input
           type="date"
           name={name}
           value={value}
           onChange={handleInputChange}
-          className="w-full pl-10 p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
-                     bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+          className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-600 
+                     bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-gray-300"
         />
       </div>
     </div>
@@ -170,7 +285,7 @@ export default function SWPCalculator() {
       <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
         
         {/* ======================== INPUT BOX ======================== */}
-        <div className="rounded-xl border border-gray-200 dark:border-blue-900 
+        <div className="rounded-xl border border-gray-200 dark:border-gray-600 
                         bg-gray-50 dark:bg-gray-800 p-6 transition-all shadow-md">
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -184,8 +299,8 @@ export default function SWPCalculator() {
                 name="amc"
                 value={amc}
                 onChange={(e) => setAmc(e.target.value)}
-                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
-                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-600 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-gray-300 outline-none"
               >
                 {amcList.map((amc, index) => (
                   <option key={index} value={amc}>
@@ -204,8 +319,8 @@ export default function SWPCalculator() {
                 value={formData.scheme_code}
                 onChange={handleInputChange}
                 name="scheme_code"
-                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
-                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-600 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-gray-300 outline-none"
               >
                 {schemeNames?.map((s, index) => (
                   <option key={index} value={s.scheme_code}>
@@ -224,8 +339,8 @@ export default function SWPCalculator() {
                 name="total_invested_amount"
                 value={formData.total_invested_amount}
                 onChange={handleInputChange}
-                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
-                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-600 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-gray-300 outline-none"
               />
             </div>
 
@@ -241,8 +356,8 @@ export default function SWPCalculator() {
                 name="withdrawal_amount"
                 value={formData.withdrawal_amount}
                 onChange={handleInputChange}
-                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
-                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-600 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-gray-300 outline-none"
               />
             </div>
 
@@ -255,8 +370,8 @@ export default function SWPCalculator() {
                 name="swp_date"
                 value={formData.swp_date}
                 onChange={handleInputChange}
-                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
-                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-600 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-gray-300 outline-none"
               >
                 {[...Array(31)].map((_, i) => (
                   <option key={i} value={i + 1}>
@@ -275,8 +390,8 @@ export default function SWPCalculator() {
                 name="interval"
                 value={formData.interval}
                 onChange={handleInputChange}
-                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-blue-900 
-                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-600 
+                           bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-gray-300 outline-none"
               >
                 <option value="weekly">Weekly</option>
                 <option value="fortnightly">Fortnightly</option>
@@ -301,7 +416,7 @@ export default function SWPCalculator() {
         {/* ======================== RESULTS ======================== */}
         {result && (
           <div className="space-y-16">
-            <div className="rounded-xl border border-gray-200 dark:border-blue-900 
+            <div className="rounded-xl border border-gray-200 dark:dark:border-gray-600 
                             bg-gray-50 dark:bg-gray-800 p-6 flex flex-col gap-6 transition-all">
 
               <h2 className="text-xl font-bold text-blue-600 dark:text-blue-400">
@@ -313,21 +428,21 @@ export default function SWPCalculator() {
                 <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
                   <p className="text-gray-500 dark:text-gray-300 text-xs">Installments</p>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                    {result.installments}
+                    {swpResult.installments == 0? "-" : swpResult.installments.toFixed(0)}
                   </h3>
                 </div>
 
                 <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
                   <p className="text-gray-500 dark:text-gray-300 text-xs">Total Withdrawal</p>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                    ₹ {result.totalWithdrawn}
+                    ₹ {swpResult.totalWithdrawn == 0? "-" : swpResult.totalWithdrawn.toFixed(2)}
                   </h3>
                 </div>
 
                 <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
                   <p className="text-gray-500 dark:text-gray-300 text-xs">Return (%)</p>
                   <h3 className="font-semibold text-green-600">
-                    {result.returnPerc}%
+                    {swpResult.returnPerc? swpResult.returnPerc.toFixed(2) : "-"}%
                   </h3>
                 </div>
               </div>
