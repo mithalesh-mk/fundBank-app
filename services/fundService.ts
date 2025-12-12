@@ -83,6 +83,8 @@ export interface MutualFundScheme {
 }
 
 
+
+
 class FundService {
   async getFundNAV(schemeCode: string, start?: string, end?: string): Promise<FundNAVResponse> {
     const res: { data: FundNAVResponse } = await axiosInstance.get(`/funds/${schemeCode}`, {
@@ -122,6 +124,21 @@ class FundService {
 
     return data;
   }
+
+
+
+async searchFunds(query: string, signal?: AbortSignal) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_API_BASE_URL}/funds/search?query=${query}&limit=5`, {
+    method: "GET",
+    signal,
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+
+  const json = await res.json();
+  return json.data;
+}
 
 }
 
