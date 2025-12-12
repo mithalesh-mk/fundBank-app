@@ -100,6 +100,7 @@ export default function LumpsumCalculator() {
                 type="range"
                 min="1"
                 max="25"
+                step="0.1"
                 value={rate}
                 onChange={(e) => setRate(Number(e.target.value))}
                 className="custom-slider w-full"
@@ -138,6 +139,7 @@ export default function LumpsumCalculator() {
                 type="range"
                 min="1"
                 max="30"
+                step="1"
                 value={years}
                 onChange={(e) => setYears(Number(e.target.value))}
                 className="custom-slider w-full"

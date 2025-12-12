@@ -10,10 +10,10 @@ export default function ChildMarraigeCalculator() {
 
   // Conditional Fields
   const [haveSavings, setHaveSavings] = useState(false);
-  const [growthInSavings, setGrowthInSavings] = useState(0); // %
+  const [growthInSavings, setGrowthInSavings] = useState("7.5"); // %
   const [haveExistingInvestment, setHaveExistingInvestment] = useState(false);
   const [existingInvestment, setExistingInvestment] = useState(6000); // ₹
-  const [existingReturn, setExistingReturn] = useState(9.7); // %
+  const [existingReturn, setExistingReturn] = useState("9.7"); // %
 
   const sliderFill = (value: number, min: number, max: number) => ((value - min) * 100) / (max - min);
 
@@ -30,8 +30,8 @@ export default function ChildMarraigeCalculator() {
 
     // 2. SIP calculation
     let sip = futureValue / ((Math.pow(1 + r, months) - 1) / r);
-    if (haveSavings && growthInSavings > 0) {
-      const g = growthInSavings / 100;
+    if (haveSavings && parseFloat(growthInSavings) > 0) {
+      const g = parseFloat(growthInSavings) / 100;
       sip = futureValue * (r - g / 12) / (Math.pow(1 + r, months) - Math.pow(1 + g / 12, months));
     }
 
@@ -39,15 +39,17 @@ export default function ChildMarraigeCalculator() {
     const multiple = invested > 0 ? futureValue / invested : 0;
 
     // 3. Future value of existing investments
-    const fvExisting = haveExistingInvestment
-      ? existingInvestment * Math.pow(1 + existingReturn / 100, years)
+    let fvExisting = haveExistingInvestment
+      ? existingInvestment * Math.pow(1 + parseFloat(existingReturn) / 100, years)
       : 0;
+    fvExisting = isNaN(fvExisting) ? 0 : fvExisting;
+
 
     // 4. Future value of SIP
     const fvSIP = sip * ((Math.pow(1 + r, months) - 1) / r);
 
     // 5. Shortfall / Surplus
-    const shortfallAmount = (fvExisting)- futureValue;
+    const shortfallAmount = isNaN((fvExisting)- futureValue)? 0 : (fvExisting)- futureValue;
 
     console.log("shortfall: ",shortfallAmount);
 
@@ -180,7 +182,7 @@ export default function ChildMarraigeCalculator() {
           <select
             value={haveSavings ? "yes" : "no"}
             onChange={(e) => setHaveSavings(e.target.value === "yes")}
-            className="w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200"
+            className="w-full select-menu p-2 border rounded-lg bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200"
           >
             <option value="no">No</option>
             <option value="yes">Yes</option>
@@ -189,15 +191,29 @@ export default function ChildMarraigeCalculator() {
           {haveSavings && (
             <div className="mt-2">
               <p className="text-gray-700 dark:text-gray-300 mb-1 font-medium">Expected Growth in Savings (% per year)</p>
-              <select
+              <input 
                 value={growthInSavings}
-                onChange={(e) => setGrowthInSavings(Number(e.target.value))}
-                className="w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200"
-              >
-                <option value={0}>0%</option>
-                <option value={5}>5%</option>
-                <option value={10}>10%</option>
-              </select>
+                onChange={(e) => {
+                  const val = e.target.value;
+
+                  // allow empty input during typing
+                  if (val === "") {
+                    setGrowthInSavings("");
+                    return;
+                  }
+
+                  // allow decimals
+                  const num: number = parseFloat(val);
+
+                  if (!isNaN(num) && num >= 0 && num <= 100) {
+                    setGrowthInSavings(num.toString());
+                  }
+                }}
+                type="number"
+                step="0.01"   // <-- allows decimals smoothly
+                className="w-full p-1 border border-gray-300 outline-none rounded-lg"
+              />
+
             </div>
           )}
         </div>
@@ -208,7 +224,7 @@ export default function ChildMarraigeCalculator() {
           <select
             value={haveExistingInvestment ? "yes" : "no"}
             onChange={(e) => setHaveExistingInvestment(e.target.value === "yes")}
-            className="w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200"
+            className="w-full select-menu p-2 border rounded-lg bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200"
           >
             <option value="no">No</option>
             <option value="yes">Yes</option>
@@ -235,10 +251,23 @@ export default function ChildMarraigeCalculator() {
                 <input
                   value={existingReturn}
                   onChange={(e) => {
-                    const val = Number(e.target.value);
-                    if (val >= 0 && val <= 25)
-                        setExistingReturn(Number(e.target.value))
-                    }}
+                    const val = e.target.value;
+
+                    // allow empty input during typing
+                    if (val === "") {
+                      setExistingReturn("");
+                      return;
+                    }
+
+                    // allow decimals
+                    const num: number = parseFloat(val);
+
+                    if (!isNaN(num) && num >= 0 && num <= 100) {
+                      setExistingReturn(num.toString());
+                    }
+                  }}
+                  type="number"
+                  step="0.01"   // <-- allows decimals smoothly
                   className="w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200"
                 />
               </div>
