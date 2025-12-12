@@ -2,6 +2,8 @@
 
 import { ChevronDown, ChevronRight, DropletIcon } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
+import {SearchInput} from './SearchInput';
+import { SearchModal } from './SearchModal';
 
 interface FilterBarProps {
   filters: any;
@@ -195,6 +197,7 @@ export default function FiltersBar({
     const updated = { ...filters, category: updatedList };
     setFilters(updated);
   };
+  const [open, setOpen] = useState(false);
 
   return (
     <div ref={wrapperRef} className="mb-6 flex flex-wrap items-center gap-3">
@@ -337,25 +340,25 @@ export default function FiltersBar({
                   })}
 
                   <div className="border-t border-gray-200 dark:border-gray-700 p-3 flex gap-2">
-                <button
-                  className="flex-1 px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 
+                    <button
+                      className="flex-1 px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 
                 dark:text-gray-300 rounded-md text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-                  onClick={() => setFilters({ ...filters, category: [] })}
-                >
-                  Clear All
-                </button>
+                      onClick={() => setFilters({ ...filters, category: [] })}
+                    >
+                      Clear All
+                    </button>
 
-                <button
-                  className="flex-1 px-3 py-2 bg-green-600 text-white rounded-md text-sm 
+                    <button
+                      className="flex-1 px-3 py-2 bg-green-600 text-white rounded-md text-sm 
                 hover:bg-green-700 transition"
-                  onClick={() => {
-                    applyFilters();
-                    setOpenDropdown(null);
-                  }}
-                >
-                  Apply
-                </button>
-              </div>
+                      onClick={() => {
+                        applyFilters();
+                        setOpenDropdown(null);
+                      }}
+                    >
+                      Apply
+                    </button>
+                  </div>
                 </>
               )}
 
@@ -515,11 +518,28 @@ export default function FiltersBar({
         )}
       </div>
 
+      <div className="relative w-full sm:w-auto">
+        <SearchInput
+          onOpen={() => setOpen(true)}
+          placeholder="Search..."
+        />
+
+      <SearchModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+      />
+    </div>
+
       {/* ---------- CLEAR ALL ---------- */}
       <button
         className="ml-auto text-sm text-gray-500 dark:text-gray-400 hover:underline"
         onClick={() => {
-          setFilters({ category: [], fundhouse: [], tag: '',sort: { sortBy: 'cagr_1y', order: 'desc' }, });
+          setFilters({
+            category: [],
+            fundhouse: [],
+            tag: '',
+            sort: { sortBy: 'cagr_1y', order: 'desc' },
+          });
           applyFilters();
           setOpenDropdown(null);
         }}

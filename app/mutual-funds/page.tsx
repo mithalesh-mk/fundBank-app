@@ -346,7 +346,7 @@ export default function MutualFunds() {
                     <td className="px-6 py-3 flex items-center gap-3 max-w-64 md:max-w-full">
                       <img
                         src={
-                          fund.amc_img || 'https://logo.clearbit.com/sbi.co.in'
+                          'https://logo.clearbit.com/sbi.co.in'
                         }
                         onError={(e) => (e.currentTarget.src = '/mf.png')}
                         className="w-8 h-8 rounded"
