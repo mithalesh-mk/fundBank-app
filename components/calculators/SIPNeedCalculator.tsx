@@ -157,6 +157,9 @@ export default function SIPNeedCalculator() {
               <div className="relative">
                 <input
                   value={inflation}
+                  min="0"
+                  max="15"
+                  step="0.01"
                   onChange={(e) => {
                     const val = Number(e.target.value);
                     if (val >= 0 && val <= 15) setInflation(val);
