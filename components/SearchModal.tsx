@@ -120,7 +120,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             ))}
         </div>
         {!loading && debouncedValue && results.length > 0 && (
-          <Link href={`/mf?q=${debouncedValue}`}>View More</Link>
+          <Link href={`/mf?q=${debouncedValue}`} className='mt-2 underline hover:text-gray-500'>View More</Link>
         )}
       </div>
     </div>
