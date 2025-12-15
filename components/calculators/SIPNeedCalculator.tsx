@@ -180,7 +180,7 @@ export default function SIPNeedCalculator() {
       {/* ------------------------------------
           RIGHT SIDE — SMALL PREMIUM CARD
       ------------------------------------- */}
-      <div className="rounded-xl border border-gray-200 dark:border-blue-900 
+      <div className="rounded-xl border border-gray-200 dark:border-gray-600
                       bg-gray-50 dark:bg-gray-800 p-3
                       flex flex-col gap-6 transition-all">
 
