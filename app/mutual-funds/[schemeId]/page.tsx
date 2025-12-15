@@ -53,30 +53,30 @@ export default function Graph() {
     return ((navEnd - navStart) / navStart) * 100;
   };
 
-  const calculateExpectedCagr = () => {
-    try {
-      const oneY = allData['1Y'];
-      if (!oneY || oneY.length === 0) return null;
-      console.log(fundMeta);
-
-      //nav5y=NavL/((5y/100)+1)
-      const navEnd =
-        (fundMeta?.nav ?? 1) / ((fundMeta?.y5_return ?? 0 / 100) + 1);
-
-      //const navEnd = oneY[0]?.nav;
-      const navStart = fundMeta?.nav;
-
-      if (!navStart || !navEnd) return null;
-
-      const years = 1; // because range = 1 year
-
-      const cagr = ((navEnd / navStart) ** (1 / years) - 1) * 100;
-      return cagr;
-    } catch (err) {
-      console.error('CAGR calc error:', err);
-      return null;
+  const calculateExpectedCagr = (meta: FundMeta | null) => {
+    if (!meta) return null;
+  
+    // Prefer long-term CAGR
+    if (meta.y5_return && meta.y5_return > 0) {
+      return meta.y5_return;
     }
+  
+    // Fallback to 3Y return
+    const threeY = returnsByRange['3Y'];
+    if (threeY && threeY > 0) {
+      return threeY / 3;
+    }
+  
+    // Fallback to 1Y return
+    const oneY = returnsByRange['1Y'];
+    if (oneY && oneY > 0) {
+      return oneY;
+    }
+  
+    // Final fallback
+    return 12;
   };
+  
 
   const fetchAllRanges = async () => {
     if (!schemeId) return;
@@ -133,11 +133,12 @@ export default function Graph() {
   };
 
   useEffect(() => {
-    if (!loading && Object.keys(allData).length > 0) {
-      const cagr = calculateExpectedCagr();
+    if (!loading && fundMeta) {
+      const cagr = calculateExpectedCagr(fundMeta);
       setExpectedCagr(cagr);
     }
-  }, [loading, allData]);
+  }, [loading, fundMeta, returnsByRange]);
+  
 
   useEffect(() => {
     fetchAllRanges();
@@ -147,6 +148,7 @@ export default function Graph() {
 
   const data = allData[selectedRange];
   const latestNav = data ? data[data.length - 1]?.nav : null;
+  console.log('cagr ', expectedCagr)
 
   return (
     <div className="min-h-screen dark:bg-gray-900 text-black dark:text-white pt-12 px-4 sm:px-6">
@@ -268,7 +270,7 @@ export default function Graph() {
         <div className="lg:col-span-1 space-y-8">
           <ReturnCalculator
             nav={latestNav ?? 10}
-            expectedCagr={expectedCagr ?? 12}
+            expectedCagr={expectedCagr?? 0}
           />
         </div>
 
