@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Search, X } from "lucide-react";
-import fundService, { MutualFundScheme } from "@/services/fundService";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react';
+import { Search, X } from 'lucide-react';
+import fundService, { MutualFundScheme } from '@/services/fundService';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -12,12 +12,12 @@ interface SearchModalProps {
 }
 
 export function SearchModal({ isOpen, onClose }: SearchModalProps) {
-  const [query, setQuery] = useState("");
-  const [debouncedValue, setDebouncedValue] = useState("");
+  const [query, setQuery] = useState('');
+  const [debouncedValue, setDebouncedValue] = useState('');
   const [results, setResults] = useState<MutualFundScheme[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const navigate = useRouter()
+  const router = useRouter();
 
   // Debounce input
   useEffect(() => {
@@ -29,27 +29,26 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
   // Fetch with abort support
   useEffect(() => {
-  if (!debouncedValue) {
-    setResults([]);
-    return;
-  }
+    if (!debouncedValue) {
+      setResults([]);
+      return;
+    }
 
-  const controller = new AbortController();
-  setLoading(true);
+    const controller = new AbortController();
+    setLoading(true);
 
-  fundService
-    .searchFunds(debouncedValue, controller.signal)
-    .then((res) => {
-        if(res)setResults(res)
-    })
-    .catch((err) => {
-      if (err.name !== "AbortError") console.error(err);
-    })
-    .finally(() => setLoading(false));
+    fundService
+      .searchFunds(debouncedValue, controller.signal)
+      .then((res) => {
+        if (res) setResults(res);
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') console.error(err);
+      })
+      .finally(() => setLoading(false));
 
-  return () => controller.abort();
-}, [debouncedValue]);
-
+    return () => controller.abort();
+  }, [debouncedValue]);
 
   if (!isOpen) return null;
 
@@ -101,32 +100,28 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             </div>
           )}
 
-          {!loading && results.length === 0 &&  (
+          {!loading && results.length === 0 && (
             <div className="text-center text-lg text-gray-500 dark:text-gray-400 p-3">
               No Funds
             </div>
           )}
-
-        
 
           {!loading &&
             results.map((fund) => (
               <div
                 key={fund.scheme_name}
                 onClick={() => {
-                  navigate.push(`/mutual-funds/${fund.scheme_code}`)
+                  router.push(`/mutual-funds/${fund.scheme_code}`);
                 }}
                 className="px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-[#1b1e25]"
               >
                 {fund.scheme_name}
               </div>
             ))}
-            
         </div>
-        {
-                !loading && debouncedValue && results.length > 0 &&
-                (<Link href={`/mf/${debouncedValue}`}>View More</Link>)
-            }
+        {!loading && debouncedValue && results.length > 0 && (
+          <Link href={`/mf?q=${debouncedValue}`}>View More</Link>
+        )}
       </div>
     </div>
   );

@@ -127,17 +127,32 @@ class FundService {
 
 
 
-async searchFunds(query: string, signal?: AbortSignal) {
+async searchFunds(query: string, signal?: AbortSignal, paginationParams?: { page: number; limit: number }): Promise<MutualFundScheme[] | null> {
+  if (paginationParams) {
+    const { page, limit } = paginationParams;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_API_BASE_URL}/funds/search?query=${query}&page=${page}&limit=${limit}`, {
+      method: "GET",
+      signal,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    const json = await res.json();
+    return json.data;
+  } else {
   const res = await fetch(`${process.env.NEXT_PUBLIC_APP_API_BASE_URL}/funds/search?query=${query}&limit=5`, {
     method: "GET",
     signal,
     headers: {
       "Content-Type": "application/json"
     }
+  
   });
 
   const json = await res.json();
   return json.data;
+}
 }
 
 }
