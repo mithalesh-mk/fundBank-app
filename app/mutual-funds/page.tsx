@@ -345,11 +345,10 @@ export default function MutualFunds() {
                   >
                     <td className="px-6 py-3 flex items-center gap-3 max-w-64 md:max-w-full">
                       <img
-                        src={
-                          'https://logo.clearbit.com/sbi.co.in'
-                        }
+                        src={fund.amc_img}
+                        alt={fund.display_name}
                         onError={(e) => (e.currentTarget.src = '/mf.png')}
-                        className="w-8 h-8 rounded"
+                        className="w-8 h-8 rounded object-contain"
                       />
                       <a
                         href={`/mutual-funds/${fund.scheme_code}`}
@@ -358,7 +357,6 @@ export default function MutualFunds() {
                         {fund?.display_name || '—'}
                       </a>
                     </td>
-
                     <td className="px-6 py-3 hidden md:table-cell whitespace-nowrap text-sm max-w-48 md:max-w-full">
                       {fund?.sub_category || '—'}
                     </td>

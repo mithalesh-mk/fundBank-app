@@ -159,7 +159,7 @@ export default function Graph() {
           {/* Fund Heading + Logo */}
           <div className="mb-6 flex items-center gap-4">
             <img
-              src="https://res.cloudinary.com/duvp4yuyu/image/upload/v1765475412/dsp-mutual-fund_nrbmh8.png"
+              src={fundMeta?.amc_img}
               alt="Fund Logo"
               className="w-12 h-12 rounded-md"
             />
