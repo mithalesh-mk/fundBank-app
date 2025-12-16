@@ -28,6 +28,7 @@ export interface FundMeta {
   scheme_name: string;
   isin_growth: string;
   isin_div_reinvestment: string;
+  amc_img: string;
 }
 
 export default function Graph() {
@@ -158,7 +159,7 @@ export default function Graph() {
           {/* Fund Heading + Logo */}
           <div className="mb-6 flex items-center gap-4">
             <img
-              src="https://logo.clearbit.com/sbi.co.in"
+              src="https://res.cloudinary.com/duvp4yuyu/image/upload/v1765475412/dsp-mutual-fund_nrbmh8.png"
               alt="Fund Logo"
               className="w-12 h-12 rounded-md"
             />
