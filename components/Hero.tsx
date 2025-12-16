@@ -76,17 +76,6 @@ const Hero = () => {
             />
           </div>
         </div>
-
-        {/* ---------------- TRUST STATS ---------------- */}
-        <div
-          className="
-            mt-15 gap-8
-            text-center
-          "
-        >
-          <Stats />
-        </div>
-
       </div>
     </section>
   );
