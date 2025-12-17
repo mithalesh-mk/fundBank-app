@@ -122,7 +122,8 @@ export default function SWPCalculator() {
   const fetchSchemeNames = async (amc: string) => {
     try {
       const res = await fundService.getSchemeNames(amc);
-      setSchemeNames(res);
+      if(!res.ok) return
+      setSchemeNames(res.data);
     } catch (e) {
       console.error("Error loading schemes", e);
     }
@@ -135,16 +136,18 @@ export default function SWPCalculator() {
   useEffect(() => {
     const fetchSwpResult = async () => {
       try {
-        const swpResult = await fundService.calculateSwp(formData);
+        const res = await fundService.calculateSwp(formData);
 
-        const chartData = swpResult.swp_report.map((r: any) => ({
+        if(!res.ok) return
+
+        const chartData = res.data.swp_report.map((r: any) => ({
           date: r.current_date,
           value: Number(r.current_value),
         }));
 
         setResult({
-          ...swpResult,
-          data: chartData, // <<< required for chart
+          ...res.data,
+          data: chartData, 
         });
 
         console.log("SWP Result:", swpResult);
@@ -203,9 +206,9 @@ export default function SWPCalculator() {
     })
   
     try {
-      const swpResult = await fundService.calculateSwp(formData);
-    
-      const chartData = swpResult.swp_report.map((r: any) => ({
+      const res = await fundService.calculateSwp(formData);
+      if(!res.ok) return;
+      const chartData = res.data.swp_report.map((r: any) => ({
         date: r.current_date,
         value: Number(r.current_value),
       }));
@@ -221,13 +224,13 @@ export default function SWPCalculator() {
       dates.push(new Date(formData.invest_date));
     
       // All withdrawals = positive
-      swpResult.swp_report.forEach((r: any) => {
+      res.data.swp_report.forEach((r: any) => {
         cashflows.push(r.cash_flow); // already negative or positive based on your logic
         dates.push(new Date(r.current_date));
       });
     
       // Final value = positive (if you want to include current value)
-      const last = swpResult.swp_report[swpResult.swp_report.length - 1];
+      const last = res.data.swp_report[res.data.swp_report.length - 1];
       if (last) {
         cashflows.push(last.current_value);
         dates.push(new Date(last.current_date));
@@ -246,7 +249,7 @@ export default function SWPCalculator() {
     
       // Set result for UI
       setResult({
-        ...swpResult,
+        ...res.data,
         data: chartData,
       });
     } catch (error) {

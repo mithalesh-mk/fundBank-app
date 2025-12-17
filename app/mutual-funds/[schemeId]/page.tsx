@@ -165,13 +165,11 @@ export default function Graph() {
         <div className="lg:col-span-2">
           {/* Fund Heading + Logo */}
           <div className="mb-6 flex items-center gap-4">
-            <div className=''>
-                {schemeImage!=="" && <img
-                src={schemeImage}
-                alt="Fund Logo"
-                className="w-10 h-auto rounded-md object-contain overflow-hidden"
-                />}
-            </div>
+            {schemeImage!=="" && <img
+            src={schemeImage}
+            alt="Fund Logo"
+            className="w-12 h-auto rounded-md object-contain overflow-auto"
+            />}
             <h1 className="text-md md:text-2xl font-bold">
               {schemeName || 'Mutual Fund Scheme'}
             </h1>
