@@ -50,14 +50,8 @@ export default function MutualFunds() {
 
     const currentPage = reset ? 1 : page;
     setLoading(true);
-    console.log(
-      'Fetching funds, page:',
-      currentPage,
-      'with filters:',
-      usedFilters
-    );
     try {
-      let newFunds = await fundService.getAllFunds(
+      let res = await fundService.getAllFunds(
         currentPage,
         15,
         categoryFilter,
@@ -65,14 +59,10 @@ export default function MutualFunds() {
         sort.sortBy,
         sort.order
       );
-      console.log('API returned funds:', newFunds);
-      // 🛡️ SAFETY CHECK 1: If API returns null/undefined/non-array
-      if (newFunds == null || !Array.isArray(newFunds)) {
-        newFunds = [];
-      }
+      if(!res.ok) return
 
       // 🛡️ SAFETY CHECK 2: If page=1 and no results
-      if (reset && newFunds.length === 0) {
+      if (reset && res.data.length === 0) {
         setFunds([]);
         setNoResults(true);
         setLoading(false);
@@ -82,16 +72,16 @@ export default function MutualFunds() {
 
       // 🛡️ SAFETY CHECK 3: Append or replace
       if (reset) {
-        setFunds(newFunds);
+        setFunds(res.data);
       } else {
         setFunds((prev) =>
-          Array.isArray(prev) ? [...prev, ...newFunds] : newFunds
+          Array.isArray(prev) ? [...prev, ...res.data] : res.data
         );
       }
 
-      console.log('Fetched funds:', newFunds);
+      console.log('Fetched funds:', res.data);
       // 🛡️ SAFETY CHECK 4: pagination
-      if (newFunds.length < 15) {
+      if (res.data.length < 15) {
         setHasMore(false);
       } else {
         setPage(currentPage + 1);

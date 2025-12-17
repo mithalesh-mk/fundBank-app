@@ -1,6 +1,7 @@
 import axiosInstance from "@/utils/axiosInstance";
 
 export interface FundNAVResponse {
+  amc_img: string;
   meta: any;
   data: { date: string; nav: number }[];
 }
@@ -77,84 +78,128 @@ export interface MutualFundScheme {
   option_type: string;
   frequency: string;
   nav: number;
-  nav_date: string;         // empty string allowed
+  nav_date: string;         
   display_name: string;
-  amc_img: string;          // empty string allowed
+  amc_img: string;          
 }
 
-
+export type SafeResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: string };
 
 
 class FundService {
-  async getFundNAV(schemeCode: string, start?: string, end?: string): Promise<FundNAVResponse> {
-    const res: { data: FundNAVResponse } = await axiosInstance.get(`/funds/${schemeCode}`, {
-      params: { startDate: start, endDate: end }
-    });
-    return res.data;
-  }
 
-  async getAllFunds(page: number, limit: number, category: string[],fundhouse: string[], sortBy?: string, order?:number): Promise<MutualFundScheme[]> {
-  const res = await axiosInstance.get<ApiResponse<MutualFundScheme[]>>(
-    "/funds/allfunds",
-    {
-        params: {
-          page,
-          limit,
-          category,
-          fundhouse,
-          sortBy, 
-          order
-        },
+  async getFundNAV(
+    schemeCode: string,
+    start?: string,
+    end?: string
+  ): Promise<SafeResult<FundNAVResponse>> {
+    try {
+      const res = await axiosInstance.get<FundNAVResponse>(
+        `/funds/${schemeCode}`,
+        { params: { startDate: start, endDate: end } }
+      );
+
+      if (!res.data?.data || !Array.isArray(res.data.data)) {
+        return { ok: false, error: "Invalid NAV response" };
       }
-    );
 
-    return res.data.data;
-  }
-
-  async getSchemeNames(amcName: string): Promise<SchemeName[]> {
-    const res = await axiosInstance.get<SchemeName[]>(`/funds/amc/${amcName}`);
-    return res.data;
-  }
-
-  async calculateSwp(postData: SwpPostData): Promise<SwpResponse> {
-    const { data } = await axiosInstance.post<SwpResponse>(
-      "funds/swp",
-      postData
-    );
-
-    return data;
-  }
-
-
-
-async searchFunds(query: string, signal?: AbortSignal, paginationParams?: { page: number; limit: number }): Promise<MutualFundScheme[] | null> {
-  if (paginationParams) {
-    const { page, limit } = paginationParams;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_API_BASE_URL}/funds/search?query=${query}&page=${page}&limit=${limit}`, {
-      method: "GET",
-      signal,
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
-
-    const json = await res.json();
-    return json.data;
-  } else {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_API_BASE_URL}/funds/search?query=${query}&limit=5`, {
-    method: "GET",
-    signal,
-    headers: {
-      "Content-Type": "application/json"
+      return { ok: true, data: res.data };
+    } catch (err: any) {
+      return { ok: false, error: err.message ?? "NAV fetch failed" };
     }
-  
-  });
+  }
 
-  const json = await res.json();
-  return json.data;
-}
-}
+  async getAllFunds(
+    page: number,
+    limit: number,
+    category: string[],
+    fundhouse: string[],
+    sortBy?: string,
+    order?: number
+  ): Promise<SafeResult<MutualFundScheme[]>> {
+    try {
+      const res = await axiosInstance.get<ApiResponse<MutualFundScheme[]>>(
+        "/funds/allfunds",
+        {
+          params: { page, limit, category, fundhouse, sortBy, order },
+        }
+      );
 
+      if (!res.data?.success || !Array.isArray(res.data.data)) {
+        return { ok: false, error: "Invalid fund list response" };
+      }
+
+      return { ok: true, data: res.data.data };
+    } catch (err: any) {
+      return { ok: false, error: err.message ?? "Fund fetch failed" };
+    }
+  }
+
+  // get All Scheme
+  async getSchemeNames(amcName: string): Promise<SafeResult<SchemeName[]>> {
+    try {
+      const res = await axiosInstance.get<SchemeName[]>(
+        `/funds/amc/${amcName}`
+      );
+
+      if (!Array.isArray(res.data)) {
+        return { ok: false, error: "Invalid scheme name response" };
+      }
+
+      return { ok: true, data: res.data };
+    } catch (err: any) {
+      return { ok: false, error: err.message ?? "Scheme fetch failed" };
+    }
+  }
+
+  // swp calculator
+  async calculateSwp(
+    postData: SwpPostData
+  ): Promise<SafeResult<SwpResponse>> {
+    try {
+      const res = await axiosInstance.post<SwpResponse>(
+        "/funds/swp",
+        postData
+      );
+
+      if (!res.data?.success || !Array.isArray(res.data.swp_report)) {
+        return { ok: false, error: "Invalid SWP response" };
+      }
+
+      return { ok: true, data: res.data };
+    } catch (err: any) {
+      return { ok: false, error: err.message ?? "SWP calculation failed" };
+    }
+  }
+
+  // search funds
+  async searchFunds(
+    query: string,
+    signal?: AbortSignal,
+    pagination?: { page: number; limit: number }
+  ): Promise<SafeResult<MutualFundScheme[]>> {
+    try {
+      const { page = 1, limit = 5 } = pagination ?? {};
+
+      const res = await axiosInstance.get<ApiResponse<MutualFundScheme[]>>(
+        "/funds/search",
+        {
+          signal,
+          params: { query, page, limit }
+        } as any
+      );
+
+      if (!res.data?.success || !Array.isArray(res.data.data)) {
+        return { ok: false, error: "Invalid search response" };
+      }
+
+      return { ok: true, data: res.data.data };
+    } catch (err: any) {
+      return { ok: false, error: err.message ?? "Search failed" };
+    }
+  }
 }
 
 export default new FundService();

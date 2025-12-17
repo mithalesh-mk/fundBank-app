@@ -72,11 +72,11 @@ export default function MFSearch() {
         limit: PAGE_SIZE,
       })
       .then((res) => {
-        if (!res) return;
+        if (!res.ok) return;
 
-        setResults((prev) => [...prev, ...res]);
+        setResults((prev) => [...prev, ...res.data]);
 
-        if (res.length < PAGE_SIZE) {
+        if (res.data.length < PAGE_SIZE) {
           setHasMore(false);
         }
       })
