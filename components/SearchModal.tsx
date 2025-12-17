@@ -40,7 +40,11 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     fundService
       .searchFunds(debouncedValue, controller.signal)
       .then((res) => {
-        if (res) setResults(res);
+        if (res.ok) {
+          setResults(res.data);
+        }else {
+          console.error(res.error)
+        }
       })
       .catch((err) => {
         if (err.name !== 'AbortError') console.error(err);

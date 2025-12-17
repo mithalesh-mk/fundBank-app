@@ -7,6 +7,7 @@ import IntradayChart from '@/components/IntradayChart';
 import ReturnCalculator from '@/components/calculators/ReturnCalculator';
 import NumberFlow, { continuous } from '@number-flow/react';
 import { all } from 'axios';
+import Image from 'next/image';
 
 const ranges = [
   { label: '1M', days: 30 },
@@ -44,9 +45,10 @@ export default function Graph() {
   const [returnsByRange, setReturnsByRange] = useState<
     Record<string, number | null>
   >({});
+  const [schemeImage, setSchemeImage] = useState<string>('');
 
   const calculateReturn = (data: any[]) => {
-    if (!data || data.length < 2) return null;
+    if (!data || data.length < 2) return {};
 
     const navEnd = data[0]?.nav;
     const navStart = data[data.length - 1]?.nav;
@@ -100,10 +102,15 @@ export default function Graph() {
             startStr,
             endStr
           );
+          if (!response.ok) {
+            console.error(`Error fetching ${range.label} data:`, response.error);
+            return { label: range.label, data: {} };
+          }
           // Return an object with label + data
-          setSchemeName(response?.meta.scheme_name || '');
-          setFundMeta(response?.meta || null);
-          return { label: range.label, data: response?.data || null };
+          setSchemeName(response.data?.meta.scheme_name || '');
+          setFundMeta(response.data?.meta || null);
+          setSchemeImage(response.data?.amc_img || '');
+          return { label: range.label, data: response.data.data || {} };
         } catch (error) {
           console.error(`Error fetching ${range.label} data:`, error);
           return { label: range.label, data: null };
@@ -119,9 +126,9 @@ export default function Graph() {
           tempData[res.value.label] = res.value.data;
         }
       });
-      console.log(tempData);
+      console.log('tempData',tempData);
       setAllData(tempData);
-      const tempReturns: Record<string, number | null> = {};
+      const tempReturns: Record<string, any | null> = {};
       Object.keys(tempData).forEach((label) => {
         tempReturns[label] = calculateReturn(tempData[label]);
       });
@@ -158,11 +165,13 @@ export default function Graph() {
         <div className="lg:col-span-2">
           {/* Fund Heading + Logo */}
           <div className="mb-6 flex items-center gap-4">
-            <img
-              src={fundMeta?.amc_img}
-              alt="Fund Logo"
-              className="w-12 h-12 rounded-md"
-            />
+            <div className=''>
+                {schemeImage!=="" && <img
+                src={schemeImage}
+                alt="Fund Logo"
+                className="w-10 h-auto rounded-md object-contain overflow-hidden"
+                />}
+            </div>
             <h1 className="text-md md:text-2xl font-bold">
               {schemeName || 'Mutual Fund Scheme'}
             </h1>
