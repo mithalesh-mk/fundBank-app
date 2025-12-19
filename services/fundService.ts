@@ -83,6 +83,19 @@ export interface MutualFundScheme {
   amc_img: string;          
 }
 
+export interface FundDetails {
+  scheme_code: string;
+  scheme_name: string;
+  fund_house: string;
+  category: string;
+  plan_type: string;
+  parent_name: string;
+  amc_img: string;
+  cagr_3y: number;
+  display_name: string;
+}
+
+
 export type SafeResult<T> =
   | { ok: true; data: T }
   | { ok: false; error: string };
@@ -200,6 +213,39 @@ class FundService {
       return { ok: false, error: err.message ?? "Search failed" };
     }
   }
+
+  async getCategories(): Promise<SafeResult<string[]>> {
+    try {
+      const res = await axiosInstance.get<ApiResponse<string[]>>(
+        "/funds/categories/list"
+      );
+
+      if (!res.data?.success || !Array.isArray(res.data.data)) {
+        return { ok: false, error: "Invalid category response" };
+      }
+
+      return { ok: true, data: res.data.data };
+    } catch (error: any) {
+      return { ok: false, error: error.message ?? "Category fetch failed" };
+    }
+  }
+
+  async getTopFunds(category: string): Promise<SafeResult<FundDetails[]>> {
+    try {
+      const res = await axiosInstance.get<ApiResponse<FundDetails[]>>(
+        `/funds/top/${category}`,
+        { params: { limit: 3 } }
+      );
+
+      if (!res.data?.success || !Array.isArray(res.data.data)) {
+        return { ok: false, error: "Invalid top funds response" };
+      }
+
+      return { ok: true, data: res.data.data };
+    } catch (error: any) {
+      return { ok: false, error: error.message ?? "Top funds fetch failed" };
+    }
+  } 
 }
 
 export default new FundService();

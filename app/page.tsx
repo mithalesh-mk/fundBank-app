@@ -3,6 +3,7 @@
 import FeatureTreeTimeline from "@/components/FeatureTreeTimeline";
 import Hero from "@/components/Hero";
 import Stats from "@/components/Stats";
+import TopFundsByCategory from "@/components/TopFundsByCategory";
 import { TrendingUp, LineChart, BarChart3, ArrowRight } from "lucide-react";
 
 export default function Home() {
@@ -11,7 +12,7 @@ export default function Home() {
       <Hero/>
       <Stats />
       <FeatureTreeTimeline />
-
+      <TopFundsByCategory/>
     </div>
   );
 }
