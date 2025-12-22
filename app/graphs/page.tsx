@@ -5,7 +5,7 @@ import fundService from "@/services/fundService";
 
 async function Graph() {
   const data = await fundService.getFundNAV("147844", "2022-01-01", "2025-11-28");
-  if(!data){
+  if(!data.ok){
     return <div className="min-h-screen flex items-center justify-center">
       <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300">
         Unable to load data. Please try again later.
@@ -36,7 +36,7 @@ async function Graph() {
           <div className="absolute inset-0 rounded-2xl pointer-events-none 
             ring-1 ring-gray-300/40 dark:ring-white/10"></div>
 
-          <IntradayChart data={data?.data} />
+          <IntradayChart data={data?.data.data} />
         </div>
         
       </div>

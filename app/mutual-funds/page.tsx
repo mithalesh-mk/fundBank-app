@@ -51,7 +51,7 @@ export default function MutualFunds() {
     const currentPage = reset ? 1 : page;
     setLoading(true);
     try {
-      let res = await fundService.getAllFunds(
+      const res = await fundService.getAllFunds(
         currentPage,
         15,
         categoryFilter,
