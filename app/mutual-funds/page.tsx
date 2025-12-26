@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import FilterBar from '@/components/FilterBar';
-import fundService, { MutualFundScheme } from '@/services/fundService';
-import { ChevronsDown, ChevronsUpDown } from 'lucide-react';
-import React, { useState, useRef, useEffect } from 'react';
+import FilterBar from "@/components/FilterBar";
+import fundService, { MutualFundScheme } from "@/services/fundService";
+import { ChevronsDown, ChevronsUpDown } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
 
 const sortOptions = [
-  { label: '1Y', sortBy: 'cagr_1y', order: 'desc' },
-  { label: '3Y', sortBy: 'cagr_3y', order: 'desc' },
-  { label: '5Y', sortBy: 'cagr_5y', order: 'desc' },
+  { label: "1Y", sortBy: "cagr_1y", order: "desc" },
+  { label: "3Y", sortBy: "cagr_3y", order: "desc" },
+  { label: "5Y", sortBy: "cagr_5y", order: "desc" },
 ];
 
 export default function MutualFunds() {
   const [appliedFilters, setAppliedFilters] = useState({
     category: [] as string[],
     fundhouse: [] as string[],
-    tag: '',
-    sort: { sortBy: 'cagr_1y', order: 'desc' },
+    tag: "",
+    sort: { sortBy: "cagr_1y", order: "desc" },
   });
   const [pendingFilters, setPendingFilters] = useState({
     category: [] as string[],
     fundhouse: [] as string[],
-    tag: '',
-    sort: { sortBy: 'cagr_1y', order: 'desc' },
+    tag: "",
+    sort: { sortBy: "cagr_1y", order: "desc" },
   });
   const [funds, setFunds] = useState<MutualFundScheme[]>([]);
   const [page, setPage] = useState(1);
@@ -32,6 +32,9 @@ export default function MutualFunds() {
   const [noResults, setNoResults] = useState(false);
   // track sort changes on small screens
   const [trackActiveSort, setTrackActiveSort] = useState(0);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const prevScrollTopRef = useRef(0);
 
   // Fetch 50 funds at a time
   const fetchFunds = async (reset: boolean, filtersOverride?: any) => {
@@ -49,6 +52,10 @@ export default function MutualFunds() {
     }
 
     const currentPage = reset ? 1 : page;
+    if (!reset && scrollContainerRef.current) {
+      prevScrollTopRef.current = scrollContainerRef.current.scrollTop;
+    }
+
     setLoading(true);
     try {
       const res = await fundService.getAllFunds(
@@ -59,7 +66,7 @@ export default function MutualFunds() {
         sort.sortBy,
         sort.order
       );
-      if(!res.ok) return
+      if (!res.ok) return;
 
       // 🛡️ SAFETY CHECK 2: If page=1 and no results
       if (reset && res.data.length === 0) {
@@ -79,7 +86,7 @@ export default function MutualFunds() {
         );
       }
 
-      console.log('Fetched funds:', res.data);
+      console.log("Fetched funds:", res.data);
       // 🛡️ SAFETY CHECK 4: pagination
       if (res.data.length < 15) {
         setHasMore(false);
@@ -87,7 +94,7 @@ export default function MutualFunds() {
         setPage(currentPage + 1);
       }
     } catch (err) {
-      console.error('FETCH ERROR:', err);
+      console.error("FETCH ERROR:", err);
       setNoResults(true);
       setHasMore(false);
     }
@@ -108,7 +115,7 @@ export default function MutualFunds() {
           fetchFunds(false);
         }
       },
-      { threshold: 0.2 }
+      { root: scrollContainerRef.current, threshold: 0.2 }
     );
 
     const target = observerTarget.current;
@@ -121,10 +128,10 @@ export default function MutualFunds() {
 
   const getReturnColor = (value?: number) => {
     if (value === undefined || value === null || value == 0)
-      return 'text-gray-400';
+      return "text-gray-400";
     return value < 0
-      ? 'text-red-600 dark:text-red-400'
-      : 'text-green-600 dark:text-green-400';
+      ? "text-red-600 dark:text-red-400"
+      : "text-green-600 dark:text-green-400";
   };
 
   return (
@@ -146,6 +153,7 @@ export default function MutualFunds() {
 
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden w-full">
         <div
+          ref={scrollContainerRef}
           className="md:block h-[calc(100vh-250px)] overflow-y-auto overflow-x-auto [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:rounded-full
   [&::-webkit-scrollbar-track]:bg-gray-100
@@ -170,7 +178,7 @@ export default function MutualFunds() {
                     const updated = {
                       ...appliedFilters,
                       sort: {
-                        sortBy: 'cagr_1y',
+                        sortBy: "cagr_1y",
                         order: appliedFilters.sort.order,
                       },
                     };
@@ -180,9 +188,9 @@ export default function MutualFunds() {
                     fetchFunds(true, updated);
                   }}
                   className={`px-3 py-3 hidden lg:table-cell text-center font-semibold w-20 ${
-                    appliedFilters.sort.sortBy === 'cagr_1y'
-                      ? 'cursor-pointer text-gray-500'
-                      : ''
+                    appliedFilters.sort.sortBy === "cagr_1y"
+                      ? "cursor-pointer text-gray-500"
+                      : ""
                   }`}
                 >
                   1Y
@@ -195,9 +203,9 @@ export default function MutualFunds() {
                       ...appliedFilters,
                       sort: {
                         sortBy:
-                          appliedFilters.sort.sortBy === 'cagr_3y'
-                            ? 'cagr_1y'
-                            : 'cagr_3y',
+                          appliedFilters.sort.sortBy === "cagr_3y"
+                            ? "cagr_1y"
+                            : "cagr_3y",
                         order: appliedFilters.sort.order,
                       },
                     };
@@ -206,9 +214,9 @@ export default function MutualFunds() {
                     fetchFunds(true, updated);
                   }}
                   className={`px-3 py-3 hidden lg:table-cell text-center font-semibold w-20 ${
-                    appliedFilters.sort.sortBy === 'cagr_3y'
-                      ? 'cursor-pointer text-gray-500'
-                      : ''
+                    appliedFilters.sort.sortBy === "cagr_3y"
+                      ? "cursor-pointer text-gray-500"
+                      : ""
                   }`}
                 >
                   3Y
@@ -221,9 +229,9 @@ export default function MutualFunds() {
                       ...appliedFilters,
                       sort: {
                         sortBy:
-                          appliedFilters.sort.sortBy === 'cagr_5y'
-                            ? 'cagr_1y'
-                            : 'cagr_5y',
+                          appliedFilters.sort.sortBy === "cagr_5y"
+                            ? "cagr_1y"
+                            : "cagr_5y",
                         order: appliedFilters.sort.order,
                       },
                     };
@@ -233,9 +241,9 @@ export default function MutualFunds() {
                     fetchFunds(true, updated);
                   }}
                   className={`px-3 py-3 hidden lg:table-cell text-center font-semibold w-20 ${
-                    appliedFilters.sort.sortBy === 'cagr_5y'
-                      ? 'cursor-pointer text-gray-500'
-                      : ''
+                    appliedFilters.sort.sortBy === "cagr_5y"
+                      ? "cursor-pointer text-gray-500"
+                      : ""
                   }`}
                 >
                   5Y
@@ -253,9 +261,10 @@ export default function MutualFunds() {
                           sortOptions[
                             (trackActiveSort + 1) % sortOptions.length
                           ].sortBy,
-                        order: sortOptions[
-                          (trackActiveSort + 1) % sortOptions.length
-                        ].order,
+                        order:
+                          sortOptions[
+                            (trackActiveSort + 1) % sortOptions.length
+                          ].order,
                       },
                     };
 
@@ -279,6 +288,121 @@ export default function MutualFunds() {
               </tr>
             </thead>
 
+            <tbody className="text-gray-900 dark:text-gray-200 text-[16px]">
+              {funds &&
+                Array.isArray(funds) &&
+                funds.length > 0 &&
+                funds.map((fund, i) => (
+                  <tr
+                    key={`${fund.scheme_code}-${i}`}
+                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/40 transition"
+                  >
+                    <td className="px-6 py-3 flex items-center gap-3 max-w-64 md:max-w-full">
+                      <img
+                        src={fund.amc_img}
+                        alt={fund.display_name}
+                        onError={(e) => (e.currentTarget.src = "/mf.png")}
+                        className="w-8 h-8 rounded object-contain"
+                      />
+                      <a
+                        href={`/mutual-funds/${fund.scheme_code}`}
+                        className="text-blue-600 dark:text-blue-400 hover:underline text-sm line-clamp-1 md:line-clamp-2"
+                      >
+                        {fund?.display_name || "—"}
+                      </a>
+                    </td>
+                    <td className="px-6 py-3 hidden md:table-cell whitespace-nowrap text-sm max-w-48 md:max-w-full">
+                      {fund?.sub_category || "—"}
+                    </td>
+
+                    <td
+                      className={`px-3 hidden py-3 lg:table-cell text-center ${getReturnColor(
+                        fund.cagr_1y
+                      )}`}
+                    >
+                      {fund?.cagr_1y == 0
+                        ? "-"
+                        : `${fund.cagr_1y?.toFixed(2)}%`}
+                    </td>
+
+                    <td
+                      className={`px-3 hidden py-3 lg:table-cell text-center ${getReturnColor(
+                        fund.cagr_3y
+                      )}`}
+                    >
+                      {fund?.cagr_3y == 0
+                        ? "-"
+                        : `${fund.cagr_3y?.toFixed(2)}%`}
+                    </td>
+
+                    <td
+                      className={`px-3 py-3 text-center hidden lg:table-cell ${getReturnColor(
+                        fund.cagr_5y
+                      )}`}
+                    >
+                      {fund?.cagr_5y == 0
+                        ? "-"
+                        : `${fund.cagr_5y?.toFixed(2)}%`}
+                    </td>
+
+                    <td
+                      className={`px-3 py-3 text-center table-cell lg:hidden ${getReturnColor(
+                        sortOptions[trackActiveSort].sortBy === "cagr_1y"
+                          ? fund.cagr_1y
+                          : sortOptions[trackActiveSort].sortBy === "cagr_3y"
+                          ? fund.cagr_3y
+                          : fund.cagr_5y
+                      )}`}
+                    >
+                      {sortOptions[trackActiveSort].sortBy === "cagr_1y"
+                        ? fund.cagr_1y == 0
+                          ? "-"
+                          : `${fund.cagr_1y?.toFixed(2)}%`
+                        : sortOptions[trackActiveSort].sortBy === "cagr_3y"
+                        ? fund.cagr_3y == 0
+                          ? "-"
+                          : `${fund.cagr_3y?.toFixed(2)}%`
+                        : fund.cagr_5y == 0
+                        ? "-"
+                        : `${fund.cagr_5y?.toFixed(2)}%`}
+                    </td>
+
+                    <td className="px-3 py-3 hidden lg:table-cell text-center">
+                      ₹{fund.nav}
+                    </td>
+                    <td className="px-3 py-3 hidden lg:table-cell text-center">
+                      {fund.frequency}
+                    </td>
+                  </tr>
+                ))}
+
+              {/* Loading */}
+              {loading && (
+                <tr>
+                  <td colSpan={7} className="px-6 py-6 text-center">
+                    <div className="flex justify-center items-center gap-2">
+                      <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Loading more...
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              )}
+
+              {/* End */}
+              {!hasMore ||
+                (Array.isArray(funds) && funds.length == 0 && !loading && (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="px-6 py-6 text-center text-gray-500 dark:text-gray-400"
+                    >
+                      No more funds to load
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
             {loading && (
               <tbody>
                 {Array.from({ length: 15 }).map((_, i) => (
@@ -323,122 +447,6 @@ export default function MutualFunds() {
                 ))}
               </tbody>
             )}
-
-            <tbody className="text-gray-900 dark:text-gray-200 text-[16px]">
-              {funds &&
-                Array.isArray(funds) &&
-                funds.length > 0 &&
-                funds.map((fund, i) => (
-                  <tr
-                    key={`${fund.scheme_code}-${i}`}
-                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/40 transition"
-                  >
-                    <td className="px-6 py-3 flex items-center gap-3 max-w-64 md:max-w-full">
-                      <img
-                        src={fund.amc_img}
-                        alt={fund.display_name}
-                        onError={(e) => (e.currentTarget.src = '/mf.png')}
-                        className="w-8 h-8 rounded object-contain"
-                      />
-                      <a
-                        href={`/mutual-funds/${fund.scheme_code}`}
-                        className="text-blue-600 dark:text-blue-400 hover:underline text-sm line-clamp-1 md:line-clamp-2"
-                      >
-                        {fund?.display_name || '—'}
-                      </a>
-                    </td>
-                    <td className="px-6 py-3 hidden md:table-cell whitespace-nowrap text-sm max-w-48 md:max-w-full">
-                      {fund?.sub_category || '—'}
-                    </td>
-
-                    <td
-                      className={`px-3 hidden py-3 lg:table-cell text-center ${getReturnColor(
-                        fund.cagr_1y
-                      )}`}
-                    >
-                      {fund?.cagr_1y == 0
-                        ? '-'
-                        : `${fund.cagr_1y?.toFixed(2)}%`}
-                    </td>
-
-                    <td
-                      className={`px-3 hidden py-3 lg:table-cell text-center ${getReturnColor(
-                        fund.cagr_3y
-                      )}`}
-                    >
-                      {fund?.cagr_3y == 0
-                        ? '-'
-                        : `${fund.cagr_3y?.toFixed(2)}%`}
-                    </td>
-
-                    <td
-                      className={`px-3 py-3 text-center hidden lg:table-cell ${getReturnColor(
-                        fund.cagr_5y
-                      )}`}
-                    >
-                      {fund?.cagr_5y == 0
-                        ? '-'
-                        : `${fund.cagr_5y?.toFixed(2)}%`}
-                    </td>
-
-                    <td
-                      className={`px-3 py-3 text-center table-cell lg:hidden ${getReturnColor(
-                        sortOptions[trackActiveSort].sortBy === 'cagr_1y'
-                          ? fund.cagr_1y
-                          : sortOptions[trackActiveSort].sortBy === 'cagr_3y'
-                          ? fund.cagr_3y
-                          : fund.cagr_5y
-                      )}`}
-                    >
-                      {sortOptions[trackActiveSort].sortBy === 'cagr_1y'
-                        ? fund.cagr_1y == 0
-                          ? '-'
-                          : `${fund.cagr_1y?.toFixed(2)}%`
-                        : sortOptions[trackActiveSort].sortBy === 'cagr_3y'
-                        ? fund.cagr_3y == 0
-                          ? '-'
-                          : `${fund.cagr_3y?.toFixed(2)}%`
-                        : fund.cagr_5y == 0
-                        ? '-'
-                        : `${fund.cagr_5y?.toFixed(2)}%`}
-                    </td>
-
-                    <td className="px-3 py-3 hidden lg:table-cell text-center">
-                      ₹{fund.nav}
-                    </td>
-                    <td className="px-3 py-3 hidden lg:table-cell text-center">
-                      {fund.frequency}
-                    </td>
-                  </tr>
-                ))}
-
-              {/* Loading */}
-              {loading && (
-                <tr>
-                  <td colSpan={7} className="px-6 py-6 text-center">
-                    <div className="flex justify-center items-center gap-2">
-                      <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-gray-600 dark:text-gray-400">
-                        Loading more...
-                      </span>
-                    </div>
-                  </td>
-                </tr>
-              )}
-
-              {/* End */}
-              {!hasMore ||
-                (Array.isArray(funds) && funds.length == 0 && !loading && (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-6 py-6 text-center text-gray-500 dark:text-gray-400"
-                    >
-                      No more funds to load
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
           </table>
 
           <div ref={observerTarget} className="h-6" />

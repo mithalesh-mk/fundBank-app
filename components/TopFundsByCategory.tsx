@@ -59,7 +59,7 @@ const TopFundsByCategory = () => {
               onClick={() => getTopFunds(category)}
               disabled={loading}
               className={
-                "flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 border backdrop-blur " +
+                "shrink-0 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 border backdrop-blur " +
                 (isActive
                   ? "bg-blue-600 text-white border-blue-600 shadow-blue-600/30 "
                   : "bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 ") +
