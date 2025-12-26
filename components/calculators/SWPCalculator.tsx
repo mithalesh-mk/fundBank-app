@@ -352,6 +352,7 @@ export default function SWPCalculator() {
                         : '1px solid rgb(229 231 235)',
                     boxShadow: 'none',
                   },
+                  // @ts-expect-error: This is a known issue with the legacy API
                   placeholder: {
                     color: theme === 'dark' ? 'white' : 'black',
                   },
