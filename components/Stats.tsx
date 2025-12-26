@@ -2,8 +2,8 @@ import { ShieldCheck, Users, Wallet, Network } from "lucide-react";
 
 const Stats = () => {
   return (
-    <div className="mt-10 w-full flex justify-center">
-      <div className="grid grid-cols-4 mx-auto p-2 md:border-2 border-cyan-500 md:p-4 rounded-4xl  md:grid-cols-4 gap-10 md:gap-6 text-center">
+    <div className="mt-4 w-full flex justify-center">
+      <div className="grid grid-cols-4 mx-4 p-2 border md:border-2 border-cyan-500 md:p-4 rounded-4xl md:grid-cols-4 gap-10 md:gap-6 text-center">
 
         {/* ITEM 1 */}
         <div className="flex flex-col items-center">
