@@ -6,8 +6,6 @@ import fundService from '@/services/fundService';
 import IntradayChart from '@/components/IntradayChart';
 import ReturnCalculator from '@/components/calculators/ReturnCalculator';
 import NumberFlow, { continuous } from '@number-flow/react';
-import { all } from 'axios';
-import Image from 'next/image';
 
 const ranges = [
   { label: '1M', days: 30 },
