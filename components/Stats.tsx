@@ -3,7 +3,7 @@ import { ShieldCheck, Users, Wallet, Network } from "lucide-react";
 const Stats = () => {
   return (
     <div className="mt-4 w-full flex justify-center">
-      <div className="grid grid-cols-4 mx-4 p-2 border md:border-2 border-cyan-500 md:p-4 rounded-4xl md:grid-cols-4 gap-10 md:gap-6 text-center">
+      <div className="grid grid-cols-4 mx-4 p-2 border md:border-2 border-cyan-500 md:p-4 rounded-4xl md:grid-cols-4 gap-10 md:gap-20 text-center">
 
         {/* ITEM 1 */}
         <div className="flex flex-col items-center">
@@ -20,7 +20,7 @@ const Stats = () => {
         <div className="flex flex-col items-center">
           <Users className="w-8 h-8 text-purple-600 dark:text-purple-400 mb-2" />
           <p className="text-[10px] md:text-sm text-gray-600 dark:text-gray-300">
-            Happy Investors
+            Happy
           </p>
           <p className="text-md font-bold text-gray-900 dark:text-white">
             42,71,690
@@ -31,7 +31,7 @@ const Stats = () => {
         <div className="flex flex-col items-center">
           <Wallet className="w-8 h-8 text-green-600 dark:text-green-400 mb-2" />
           <p className="text-[10px] md:text-sm text-gray-600 dark:text-gray-300">
-            Assets Under Management
+            Assets
           </p>
           <p className="text-md font-bold text-gray-900 dark:text-white">
             2,86,147Cr.
@@ -42,8 +42,9 @@ const Stats = () => {
         <div className="flex flex-col items-center">
           <Network className="w-8 h-8 text-orange-600 dark:text-orange-400 mb-2" />
           <p className="text-[10px] md:text-sm text-gray-600 dark:text-gray-300">
-            Active Distributors
+            Distributors
           </p>
+          
           <p className="text-md font-bold text-gray-900 dark:text-white">
             50,932
           </p>
