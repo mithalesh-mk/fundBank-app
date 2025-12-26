@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 
 import {
   AreaChart,
@@ -10,13 +10,12 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 
-import { Moon, Sun, Download, Calendar as CalendarIcon } from 'lucide-react';
-import fundService, { SchemeName } from '@/services/fundService';
-import { Select } from 'antd';
-import { useTheme } from '@/utils/ThemeProvider';
-import { color } from 'chart.js/helpers';
+import { Moon, Sun, Download, Calendar as CalendarIcon } from "lucide-react";
+import fundService, { SchemeName } from "@/services/fundService";
+import { Select } from "antd";
+import { useTheme } from "@/utils/ThemeProvider";
 
 // -----------------------
 // XIRR CALCULATOR
@@ -47,62 +46,64 @@ function xirr(cashflows: number[], dates: Date[], guess = 0.1) {
 // AMC LIST
 // ---------------------------------------------------
 const amcList = [
-  'Aditya Birla Sun Life Mutual Fund',
-  'Angel One Mutual Fund',
-  'Axis Mutual Fund',
-  'Bajaj Finserv Mutual Fund',
-  'Bandhan Mutual Fund',
-  'Bank of India Mutual Fund',
-  'Baroda BNP Paribas Mutual Fund',
-  'Canara Robeco Mutual Fund',
-  'Capitalmind Mutual Fund',
-  'Choice Mutual Fund',
-  'DSP Mutual Fund',
-  'Edelweiss Mutual Fund',
-  'Franklin Templeton Mutual Fund',
-  'Groww Mutual Fund',
-  'HDFC Mutual Fund',
-  'HSBC Mutual Fund',
-  'Helios Mutual Fund',
-  'ICICI Prudential Mutual Fund',
-  'IL&FS Mutual Fund (IDF)',
-  'ITI Mutual Fund',
-  'Invesco Mutual Fund',
-  'JM Financial Mutual Fund',
-  'Jio BlackRock Mutual Fund',
-  'Kotak Mahindra Mutual Fund',
-  'LIC Mutual Fund',
-  'Mahindra Manulife Mutual Fund',
-  'Mirae Asset Mutual Fund',
-  'Motilal Oswal Mutual Fund',
-  'NJ Mutual Fund',
-  'Navi Mutual Fund',
-  'Nippon India Mutual Fund',
-  'Old Bridge Mutual Fund',
-  'PGIM India Mutual Fund',
-  'PPFAS Mutual Fund',
-  'Quantum Mutual Fund',
-  'SBI Mutual Fund',
-  'Samco Mutual Fund',
-  'Shriram Mutual Fund',
-  'Sundaram Mutual Fund',
-  'Tata Mutual Fund',
-  'Taurus Mutual Fund',
-  'The Wealth Company Mutual Fund',
-  'Trust Mutual Fund',
-  'UTI Mutual Fund',
-  'Unifi Mutual Fund',
-  'Union Mutual Fund',
-  'WhiteOak Capital Mutual Fund',
-  'Zerodha Mutual Fund',
-  'quant Mutual Fund',
+  "Aditya Birla Sun Life Mutual Fund",
+  "Angel One Mutual Fund",
+  "Axis Mutual Fund",
+  "Bajaj Finserv Mutual Fund",
+  "Bandhan Mutual Fund",
+  "Bank of India Mutual Fund",
+  "Baroda BNP Paribas Mutual Fund",
+  "Canara Robeco Mutual Fund",
+  "Capitalmind Mutual Fund",
+  "Choice Mutual Fund",
+  "DSP Mutual Fund",
+  "Edelweiss Mutual Fund",
+  "Franklin Templeton Mutual Fund",
+  "Groww Mutual Fund",
+  "HDFC Mutual Fund",
+  "HSBC Mutual Fund",
+  "Helios Mutual Fund",
+  "ICICI Prudential Mutual Fund",
+  "IL&FS Mutual Fund (IDF)",
+  "ITI Mutual Fund",
+  "Invesco Mutual Fund",
+  "JM Financial Mutual Fund",
+  "Jio BlackRock Mutual Fund",
+  "Kotak Mahindra Mutual Fund",
+  "LIC Mutual Fund",
+  "Mahindra Manulife Mutual Fund",
+  "Mirae Asset Mutual Fund",
+  "Motilal Oswal Mutual Fund",
+  "NJ Mutual Fund",
+  "Navi Mutual Fund",
+  "Nippon India Mutual Fund",
+  "Old Bridge Mutual Fund",
+  "PGIM India Mutual Fund",
+  "PPFAS Mutual Fund",
+  "Quantum Mutual Fund",
+  "SBI Mutual Fund",
+  "Samco Mutual Fund",
+  "Shriram Mutual Fund",
+  "Sundaram Mutual Fund",
+  "Tata Mutual Fund",
+  "Taurus Mutual Fund",
+  "The Wealth Company Mutual Fund",
+  "Trust Mutual Fund",
+  "UTI Mutual Fund",
+  "Unifi Mutual Fund",
+  "Union Mutual Fund",
+  "WhiteOak Capital Mutual Fund",
+  "Zerodha Mutual Fund",
+  "quant Mutual Fund",
 ];
 
 export default function SWPCalculator() {
   const [darkMode, setDarkMode] = useState(false);
   const [result, setResult] = useState<any>(null);
-  const [amc, setAmc] = useState<string>('Mirae Asset Mutual Fund');
+  const [amc, setAmc] = useState<string>("Mirae Asset Mutual Fund");
   const [schemeNames, setSchemeNames] = useState<SchemeName[]>([]);
+  const selectRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const { theme } = useTheme();
 
@@ -113,14 +114,14 @@ export default function SWPCalculator() {
   });
 
   const [formData, setFormData] = useState({
-    scheme_code: '119551',
+    scheme_code: "119551",
     swp_date: 10,
-    invest_date: '2016-08-20',
-    start_date: '2016-08-20',
+    invest_date: "2016-08-20",
+    start_date: "2016-08-20",
     total_invested_amount: 1000000,
-    end_date: '2025-12-07',
+    end_date: "2025-12-07",
     withdrawal_amount: 3000,
-    interval: 'monthly',
+    interval: "monthly",
   });
 
   const fetchSchemeNames = async (amc: string) => {
@@ -129,7 +130,7 @@ export default function SWPCalculator() {
       if (!res.ok) return;
       setSchemeNames(res.data);
     } catch (e) {
-      console.error('Error loading schemes', e);
+      console.error("Error loading schemes", e);
     }
   };
 
@@ -154,9 +155,9 @@ export default function SWPCalculator() {
           data: chartData,
         });
 
-        console.log('SWP Result:', swpResult);
+        console.log("SWP Result:", swpResult);
       } catch (error) {
-        console.error('Error calculating SWP:', error);
+        console.error("Error calculating SWP:", error);
       }
     };
 
@@ -168,9 +169,9 @@ export default function SWPCalculator() {
     const { name, value } = e.target;
 
     const numberFields = [
-      'total_invested_amount',
-      'withdrawal_amount',
-      'swp_date',
+      "total_invested_amount",
+      "withdrawal_amount",
+      "swp_date",
     ];
 
     setFormData((prev) => ({
@@ -186,7 +187,12 @@ export default function SWPCalculator() {
         ...prev,
         scheme_code: selectedScheme.scheme_code,
       }));
+      setIsOpen(false);
     }
+  };
+
+  const handleDropdownVisibleChange = (open : any) => {
+    setIsOpen(open);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -195,14 +201,14 @@ export default function SWPCalculator() {
     //calculate installment based on intervals
     const totalTimeIntervals = (interval: string) => {
       switch (interval) {
-        case 'weekly':
+        case "weekly":
           return 7;
-        case 'fortnightly':
+        case "fortnightly":
           return 14;
-        case 'monthly':
+        case "monthly":
           return 30;
-        case 'yearly':
-          return 365;
+        case "quarterly":
+          return 90;
         default:
           return 0;
       }
@@ -252,7 +258,7 @@ export default function SWPCalculator() {
       // Calculate XIRR
       let irr = xirr(cashflows, dates);
       irr = irr * 100; // convert to %
-      console.log('XIRR:', irr);
+      console.log("XIRR:", irr);
 
       // Update return %
       setSwpResult((prev) => ({
@@ -266,7 +272,7 @@ export default function SWPCalculator() {
         data: chartData,
       });
     } catch (error) {
-      console.error('Error calculating SWP:', error);
+      console.error("Error calculating SWP:", error);
     }
   };
 
@@ -325,15 +331,18 @@ export default function SWPCalculator() {
                 Select Scheme
               </label>
               <Select
-                showSearch
-                filterOption={(input, option) =>
-                  (option?.label ?? '')
-                    .toString()
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
+              ref={selectRef}
+              open={isOpen}
+              onDropdownVisibleChange={handleDropdownVisibleChange}
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toString()
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
                 }
                 placeholder="Select a person"
-                onChange={handleSchemeChange}
+                onSelect={handleSchemeChange}
                 options={schemeNames?.map((s) => ({
                   label: `${s.scheme_name} ${s.scheme_code}`,
                   value: s.scheme_code,
@@ -341,37 +350,37 @@ export default function SWPCalculator() {
                 className="w-full"
                 styles={{
                   root: {
-                    padding: '10px',
-                    borderRadius: '0.5rem',
-                    color: theme === 'dark' ? 'white' : 'black',
+                    padding: "10px",
+                    borderRadius: "0.5rem",
+                    color: theme === "dark" ? "white" : "black",
                     backgroundColor:
-                      theme === 'dark' ? 'rgb(55 65 81)' : 'rgb(249 250 251)',
+                      theme === "dark" ? "rgb(55 65 81)" : "rgb(249 250 251)",
                     border:
-                      theme === 'dark'
-                        ? '1px solid rgb(75 85 99)'
-                        : '1px solid rgb(229 231 235)',
-                    boxShadow: 'none',
+                      theme === "dark"
+                        ? "1px solid rgb(75 85 99)"
+                        : "1px solid rgb(229 231 235)",
+                    boxShadow: "none",
                   },
                   // @ts-expect-error: This is a known issue with the legacy API
                   placeholder: {
-                    color: theme === 'dark' ? 'white' : 'black',
+                    color: theme === "dark" ? "white" : "black",
                   },
                   popup: {
                     root: {
-                      width: '400px',
-                      color: theme === 'dark' ? 'white' : 'black',
+                      color: theme === "dark" ? "white" : "black",
                       backgroundColor:
-                        theme === 'dark' ? 'rgb(55 65 81)' : 'rgb(249 250 251)',
+                        theme === "dark" ? "rgb(55 65 81)" : "rgb(249 250 251)",
                     },
                     listItem: {
                       backgroundColor:
-                        theme === 'dark' ? 'rgb(55 65 81)' : 'rgb(249 250 251)',
-                      color: theme === 'dark' ? 'white' : 'black',
+                        theme === "dark" ? "rgb(55 65 81)" : "rgb(249 250 251)",
+                      color: theme === "dark" ? "white" : "black",
+
                     },
                   },
                   suffix: {
-                    color: theme === 'dark' ? 'white' : 'black',
-                  }
+                    color: theme === "dark" ? "white" : "black",
+                  },
                 }}
               />
             </div>
@@ -446,7 +455,7 @@ export default function SWPCalculator() {
                 <option value="weekly">Weekly</option>
                 <option value="fortnightly">Fortnightly</option>
                 <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
+                <option value="quarterly">Quarterly</option>
               </select>
             </div>
 
@@ -490,7 +499,7 @@ export default function SWPCalculator() {
                   </p>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-100">
                     {swpResult.installments == 0
-                      ? '-'
+                      ? "-"
                       : swpResult.installments.toFixed(0)}
                   </h3>
                 </div>
@@ -500,9 +509,9 @@ export default function SWPCalculator() {
                     Total Withdrawal
                   </p>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                    ₹{' '}
+                    ₹{" "}
                     {swpResult.totalWithdrawn == 0
-                      ? '-'
+                      ? "-"
                       : swpResult.totalWithdrawn.toFixed(2)}
                   </h3>
                 </div>
@@ -514,7 +523,7 @@ export default function SWPCalculator() {
                   <h3 className="font-semibold text-green-600">
                     {swpResult.returnPerc
                       ? swpResult.returnPerc.toFixed(2)
-                      : '-'}
+                      : "-"}
                     %
                   </h3>
                 </div>
@@ -524,7 +533,7 @@ export default function SWPCalculator() {
             <div className="w-full h-72">
               <h3
                 className={`text-lg font-semibold mb-4 ${
-                  darkMode ? 'text-gray-100' : 'text-gray-800'
+                  darkMode ? "text-gray-100" : "text-gray-800"
                 }`}
               >
                 SWP Growth Chart
@@ -548,14 +557,14 @@ export default function SWPCalculator() {
                   <CartesianGrid
                     strokeDasharray="4 4"
                     vertical={false}
-                    stroke={darkMode ? '#1f2a48' : '#e5e7eb'}
+                    stroke={darkMode ? "#1f2a48" : "#e5e7eb"}
                   />
 
                   {/* X-Axis */}
                   <XAxis
                     dataKey="date"
                     tick={{
-                      fill: darkMode ? '#c9d1d9' : '#374151',
+                      fill: darkMode ? "#c9d1d9" : "#374151",
                       fontSize: 12,
                     }}
                     axisLine={false}
@@ -564,11 +573,11 @@ export default function SWPCalculator() {
                       const d = new Date(value);
 
                       // Check for invalid date
-                      if (isNaN(d.getTime())) return '';
+                      if (isNaN(d.getTime())) return "";
 
-                      return d.toLocaleString('en-US', {
-                        month: 'short',
-                        year: 'numeric',
+                      return d.toLocaleString("en-US", {
+                        month: "short",
+                        year: "numeric",
                       });
                     }}
                   />
@@ -576,7 +585,7 @@ export default function SWPCalculator() {
                   {/* Y-Axis */}
                   <YAxis
                     tick={{
-                      fill: darkMode ? '#c9d1d9' : '#374151',
+                      fill: darkMode ? "#c9d1d9" : "#374151",
                       fontSize: 12,
                     }}
                     axisLine={false}
@@ -587,14 +596,14 @@ export default function SWPCalculator() {
                   {/* Tooltip */}
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: darkMode ? '#111827' : '#ffffff',
-                      borderColor: darkMode ? '#374151' : '#e5e7eb',
+                      backgroundColor: darkMode ? "#111827" : "#ffffff",
+                      borderColor: darkMode ? "#374151" : "#e5e7eb",
                       borderRadius: 10,
                       fontSize: 12,
                     }}
                     formatter={(value: number) => [
                       `₹ ${value.toLocaleString()}`,
-                      'Value',
+                      "Value",
                     ]}
                   />
 
@@ -663,8 +672,8 @@ export default function SWPCalculator() {
                         <td
                           className={`p-2 ${
                             row.capital_gains_loss >= 0
-                              ? 'text-green-600'
-                              : 'text-red-500'
+                              ? "text-green-600"
+                              : "text-red-500"
                           }`}
                         >
                           ₹ {row.capital_gains_loss.toFixed(2)}
