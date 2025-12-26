@@ -1,79 +1,85 @@
-import Image from "next/image";
-import Stats from "./Stats";
+"use client";
+import React from "react";
 
 const Hero = () => {
   return (
     <section
       className="
-        w-full px-6
-        bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(210,100%,90%),transparent)]
-        dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(210,100%,16%),transparent)]
+        relative w-full px-6 overflow-hidden
       "
     >
-      <div className="max-w-7xl mx-auto pt-28 font-mulish">
+      {/* subtle grain background */}
+      <div
+        className="
+          pointer-events-none absolute inset-0
+          dark:opacity-20
+        "
+      />
 
-        {/* ---------------- HERO ROW ---------------- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-
-          {/* LEFT CONTENT */}
-          <div className="text-center md:text-left">
-            <div
-              className="
-                inline-flex items-center gap-2 px-4 py-2 rounded-full border backdrop-blur-sm
-                bg-gradient-to-r from-blue-100/40 to-purple-100/40 border-blue-300/50
-                dark:from-blue-500/10 dark:to-purple-500/10 dark:border-blue-800/50
-              "
-            >
-              <span
-                className="
-                  text-sm bg-gradient-to-r bg-clip-text text-transparent
-                  from-blue-700 to-purple-700
-                  dark:from-blue-400 dark:to-purple-400
-                "
-              >
-                Trusted by 100,000+ investors
-              </span>
-            </div>
-
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mt-4 text-gray-900 dark:text-white">
-              Smarter Investing for
-              <span
-                className="
-                  block bg-gradient-to-r text-transparent bg-clip-text
-                  from-blue-600 to-blue-800
-                  dark:from-blue-400 dark:to-blue-600
-                "
-              >
-                Your Financial Growth
-              </span>
-            </h1>
-
-            <p className="text-lg md:text-xl mt-4 text-gray-600 dark:text-gray-300">
-              Analyse mutual funds, track performance, and make confident
-              investment decisions with real-time insights.
-            </p>
-
-            <div className="mt-8 flex justify-center md:justify-start gap-4">
-              <button className="px-6 py-3 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition">
-                Get Started
-              </button>
-
-              <button className="px-6 py-3 rounded-md text-sm font-medium border border-gray-300 dark:border-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                Explore Funds
-              </button>
-            </div>
+      <div className="relative max-w-7xl mx-auto pt-28 pb-24 font-mulish">
+        {/* HERO CONTENT */}
+        <div className="flex flex-col items-center text-center">
+          {/* TOP PILL */}
+          <div className=" inline-flex items-center gap-2 px-4 py-2 rounded-full border backdrop-blur-sm bg-linear-to-r from-blue-100/40 to-purple-100/40 border-blue-300/50 dark:from-blue-500/10 dark:to-purple-500/10 dark:border-blue-800/50 ">
+            {" "}
+            <span className=" text-sm bg-linear-to-r bg-clip-text text-transparent from-blue-700 to-purple-700 dark:from-blue-400 dark:to-purple-400 ">
+              {" "}
+              Trusted by 100,000+ investors{" "}
+            </span>{" "}
           </div>
 
-          {/* RIGHT IMAGE */}
-          <div className="flex justify-center md:justify-end">
-            <Image
-              src="/ggg.png"
-              alt="Investment Dashboard"
-              width={600}
-              height={420}
-              className="rounded-xl"
-              priority
-            />
+          {/* HEADING */}
+          <h1
+            className="
+              text-4xl sm:text-5xl md:text-6xl mt-5
+              font-semibold tracking-tight leading-tight
+              text-gray-900 dark:text-white
+            "
+          >
+            Self-serve & <span className="text-blue-600">transparent</span>
+            <br />
+            method for investing together
+          </h1>
+
+          {/* SUBTEXT */}
+          <p
+            className="
+              mt-6 max-w-3xl
+              text-base sm:text-lg
+              text-gray-600 dark:text-gray-400
+            "
+          >
+            Whether it’s pooling resources with family, rallying friends, or
+            collaborating with like-minded individuals, our platform fosters a
+            sense of community and purpose.
+          </p>
+
+          {/* CTA BUTTONS */}
+          <div className="mt-10 flex flex-row gap-4">
+            <button
+              className="
+                px-6 py-3 rounded-xl
+                bg-blue-600 text-white
+                hover:bg-blue-700
+                dark:bg-blue-700 dark:hover:bg-blue-700
+                transition
+              "
+            >
+              Get App for Mobile
+            </button>
+
+            <button
+              className="
+                px-6 py-3 rounded-xl
+                bg-white dark:bg-gray-900
+                border border-gray-300 dark:border-gray-700
+                text-gray-900 dark:text-white
+                hover:border-gray-500
+                transition
+              "
+            >
+              Open Dashboard
+            </button>
           </div>
         </div>
       </div>
@@ -82,13 +88,3 @@ const Hero = () => {
 };
 
 export default Hero;
-
-/* ---------------- STAT COMPONENT ---------------- */
-const Stat = ({ title, value }: { title: string; value: string }) => (
-  <div>
-    <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>
-    <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-1">
-      {value}
-    </p>
-  </div>
-);

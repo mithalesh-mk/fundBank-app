@@ -8,11 +8,11 @@ import { TrendingUp, LineChart, BarChart3, ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="mb-6 md:mb-6 md:py-4">
+    <div className="mb-2 md:mb-2 md:py-2">
       <Hero/>
       <Stats />
-      <FeatureTreeTimeline />
       <TopFundsByCategory/>
+      <FeatureTreeTimeline />
     </div>
   );
 }

@@ -1,7 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
+import {
+  motion,
+  useScroll,
+  useMotionValueEvent,
+  useReducedMotion,
+} from "framer-motion";
+
+/* ---------------- DATA ---------------- */
 
 const features = [
   {
@@ -26,28 +34,30 @@ const features = [
 
 export default function FeatureTreeTimeline() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [animate, setAnimate] = useState(false);
-  const [openId, setOpenId] = useState<number | null>(0);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const reduceMotion = useReducedMotion();
 
-  /* ---------- OBSERVER ---------- */
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setAnimate(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.25 }
-    );
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start center", "end center"],
+  });
 
-    if (sectionRef.current) observer.observe(sectionRef.current);
+  const total = features.length;
 
-    return () => observer.disconnect();
-  }, []);
+  /* SCROLL → ACTIVE CARD (STRICT RANGE) */
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    const idx = Math.floor(v * total);
+    setActiveIndex(idx >= 0 && idx < total ? idx : null);
+  });
 
   return (
-    <section ref={sectionRef} className="w-full px-6 py-24 mt-24">
+    <section
+      ref={sectionRef}
+      className="
+        relative w-full px-6 py-24 mt-10
+        scroll-smooth
+      "
+    >
       <div className="max-w-6xl mx-auto">
 
         {/* HEADER */}
@@ -65,79 +75,46 @@ export default function FeatureTreeTimeline() {
         {/* TREE */}
         <div className="relative">
 
-          {/* ANIMATED CENTER LINE */}
-          <div
-            className={`
-              hidden md:block absolute left-1/2 top-0 w-[3px]
-              bg-gray-300 dark:bg-gray-700
-              ${animate ? "animate-draw-line" : "h-0"}
-            `}
-            style={{ height: "100%" }}
+          {/* SCROLL-FILLED LINE (ALL DEVICES) */}
+          <motion.div
+            className="
+              absolute top-0 w-[3px] origin-top
+              left-4 md:left-1/2
+              bg-blue-500 dark:bg-blue-400
+            "
+            style={{
+              height: "100%",
+              scaleY: scrollYProgress,
+              transform: "translateX(-50%)",
+            }}
           />
 
-          <div className="space-y-20">
-            {features.map((f, i) => {
-              const isLeft = i % 2 === 0;
-              const isOpen = openId === f.id;
+          {/* GLOW TRAIL */}
+          {!reduceMotion && (
+            <motion.div
+              className="
+                absolute top-0 w-[10px]
+                left-3 md:left-1/2
+                bg-blue-400/40 blur-xl
+              "
+              style={{
+                height: "100%",
+                scaleY: scrollYProgress,
+                transform: "translateX(-50%)",
+              }}
+            />
+          )}
 
-              return (
-                <div key={f.id} className="relative">
-
-                  {/* DESKTOP */}
-                  <div className="hidden md:grid grid-cols-[1fr_auto_1fr]">
-
-                    {isLeft ? (
-                      <Card
-                        align="right"
-                        feature={f}
-                        isOpen={isOpen}
-                        onClick={() => setOpenId(isOpen ? null : f.id)}
-                      />
-                    ) : (
-                      <div />
-                    )}
-
-                    {/* NODE */}
-                    <div className="relative flex justify-center">
-                      <div className="relative z-10 mt-[22px]">
-                        <div className="h-4 w-4 rounded-full bg-blue-600 dark:bg-blue-400 ring-4 ring-blue-100 dark:ring-blue-900" />
-                      </div>
-
-                      {/* CONNECTOR */}
-                      <div
-                        className={`absolute top-[30px] h-px w-16 bg-gray-300 dark:bg-gray-700 ${
-                          isLeft ? "-left-16" : "left-0"
-                        }`}
-                      />
-                    </div>
-
-                    {!isLeft ? (
-                      <Card
-                        align="left"
-                        feature={f}
-                        isOpen={isOpen}
-                        onClick={() => setOpenId(isOpen ? null : f.id)}
-                      />
-                    ) : (
-                      <div />
-                    )}
-                  </div>
-
-                  {/* MOBILE */}
-                  <div className="md:hidden relative pl-8">
-                    <div className="absolute left-3 top-0 h-full w-px bg-gray-300 dark:bg-gray-700" />
-                    <div className="absolute left-[9px] top-6 h-3 w-3 rounded-full bg-blue-600 dark:bg-blue-400" />
-
-                    <MobileCard
-                      feature={f}
-                      isOpen={isOpen}
-                      onClick={() => setOpenId(isOpen ? null : f.id)}
-                    />
-                  </div>
-
-                </div>
-              );
-            })}
+          <div className="space-y-32 md:space-y-24 snap-y snap-mandatory">
+            {features.map((feature, index) => (
+              <FeatureRow
+                key={feature.id}
+                feature={feature}
+                index={index}
+                isActive={activeIndex === index}
+                reduceMotion={reduceMotion}
+              />
+            ))}
           </div>
         </div>
       </div>
@@ -145,64 +122,140 @@ export default function FeatureTreeTimeline() {
   );
 }
 
-/* ---------------- CARDS ---------------- */
+/* ---------------- ROW ---------------- */
 
-function Card({ feature, isOpen, onClick, align }: any) {
+function FeatureRow({ feature, index, isActive, reduceMotion }: any) {
+  const isLeft = index % 2 === 0;
+
   return (
-    <div className={`flex ${align === "right" ? "justify-end pr-8" : "pl-8"}`}>
-      <div
-        onClick={onClick}
-        className="
-          cursor-pointer w-[380px]
-          rounded-2xl p-6
-          bg-white dark:bg-gray-900
-          border border-gray-200 dark:border-gray-800
-          shadow-sm hover:shadow-md transition
-        "
-      >
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          {feature.title}
-        </h3>
+    <div className="relative snap-center">
 
-        <Expandable feature={feature} isOpen={isOpen} />
+      {/* NODE (ALL DEVICES) */}
+      <motion.div
+        className="
+          absolute left-3 md:left-143
+          h-3 w-3 rounded-full
+        "
+        style={{ transform: "translateX(-50%)" }}
+        animate={{
+          scale: isActive ? 1.5 : 1,
+          backgroundColor: isActive ? "#2563eb" : "#9ca3af",
+        }}
+        transition={{ duration: reduceMotion ? 0 : 0.25 }}
+      />
+
+      {/* DESKTOP */}
+      <div className="hidden md:grid grid-cols-[1fr_auto_1fr] items-start">
+
+        {isLeft ? (
+          <Card feature={feature} isActive={isActive} align="right" />
+        ) : (
+          <div />
+        )}
+
+        <div />
+
+        {!isLeft ? (
+          <Card feature={feature} isActive={isActive} align="left" />
+        ) : (
+          <div />
+        )}
+      </div>
+
+      {/* MOBILE / TABLET */}
+      <div className="md:hidden pl-10">
+        <MobileCard feature={feature} isActive={isActive} />
       </div>
     </div>
   );
 }
 
-function MobileCard({ feature, isOpen, onClick }: any) {
+/* ---------------- CARD ---------------- */
+
+function Card({ feature, isActive, align }: any) {
   return (
-    <div
-      onClick={onClick}
-      className="rounded-xl p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm"
+    <div className={`flex ${align === "right" ? "justify-end pr-12" : "pl-12"}`}>
+      <motion.div
+        className="
+          w-[550px] rounded-2xl p-6
+          bg-white dark:bg-gray-900
+          border border-gray-200 dark:border-gray-800
+          shadow-sm
+        "
+        animate={{
+          opacity: isActive ? 1 : 0.2,
+          scale: isActive ? 1 : 0.95,
+        }}
+        transition={{ duration: 0.35 }}
+      >
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          {feature.title}
+        </h3>
+
+        <motion.div
+          animate={{
+            opacity: isActive ? 1 : 0,
+            y: isActive ? 0 : -12,
+          }}
+          transition={{ duration: 0.35 }}
+        >
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
+            {feature.desc}
+          </p>
+
+          <Image
+            src={feature.img}
+            alt={feature.title}
+            width={300}
+            height={160}
+            className="rounded-lg mt-2"
+          />
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ---------------- MOBILE CARD ---------------- */
+
+function MobileCard({ feature, isActive }: any) {
+  return (
+    <motion.div
+      className="
+        rounded-xl p-4
+        bg-white dark:bg-gray-900
+        border border-gray-200 dark:border-gray-800
+        shadow-sm
+      "
+      animate={{
+        opacity: isActive ? 1 : 0.25,
+        scale: isActive ? 1 : 0.96,
+      }}
+      transition={{ duration: 0.3 }}
     >
       <h3 className="text-base font-semibold text-gray-900 dark:text-white">
         {feature.title}
       </h3>
 
-      <Expandable feature={feature} isOpen={isOpen} />
-    </div>
-  );
-}
+      <motion.div
+        animate={{
+          opacity: isActive ? 1 : 0,
+          y: isActive ? 0 : -10,
+        }}
+        transition={{ duration: 0.3 }}
+      >
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
+          {feature.desc}
+        </p>
 
-function Expandable({ feature, isOpen }: any) {
-  return (
-    <div
-      className={`overflow-hidden transition-all duration-300 ${
-        isOpen ? "max-h-[420px] mt-4 opacity-100" : "max-h-0 opacity-0"
-      }`}
-    >
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        {feature.desc}
-      </p>
-
-      <Image
-        src={feature.img}
-        alt={feature.title}
-        width={260}
-        height={160}
-        className="rounded-lg"
-      />
-    </div>
+        <Image
+          src={feature.img}
+          alt={feature.title}
+          width={260}
+          height={160}
+          className="rounded-lg mt-3"
+        />
+      </motion.div>
+    </motion.div>
   );
 }
